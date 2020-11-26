@@ -1,0 +1,63 @@
+{ pkgs }:
+with pkgs;
+let
+  exe = haskell.lib.justStaticExecutables;
+in
+[
+  myEmacs
+  nix-prefetch-scripts
+  cachix
+  niv
+  alacritty
+  awscli
+  coreutils
+  parallel
+  git-lfs
+  (gitAndTools.git-crypt)
+  (gitAndTools.git-imerge)
+  (gitAndTools.gitFull)
+  (gitAndTools.bfg-repo-cleaner)
+  (gitAndTools.gitflow)
+  (gitAndTools.hub)
+  (gitAndTools.tig)
+  (gitAndTools.diff-so-fancy)
+  patch
+  patchutils
+  pijul
+  bat
+  curl
+  exa
+  fd
+  findutils
+  gawk
+  gnugrep
+  gnupg
+  gnused
+  gnutar
+  gpgme
+  htop
+  imagemagickBig
+  jq
+  less
+  m-cli
+  p7zip
+  paperkey
+  qrencode
+  renameutils
+  ripgrep
+  rlwrap
+  time
+  unrar
+  unzip
+  xquartz
+  xsv
+  xz
+  zip
+  dnsutils
+  netcat
+  openssh
+  rsync
+  terraform-docs
+  wget
+  youtube-dl
+]
