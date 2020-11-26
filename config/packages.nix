@@ -4,6 +4,7 @@ let
   exe = haskell.lib.justStaticExecutables;
 in
 [
+  neuron
   myEmacs
   nix-prefetch-scripts
   cachix

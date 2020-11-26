@@ -47,6 +47,18 @@
         "url": "https://github.com/nix-community/home-manager/archive/a3a0f1289acac24ce2ffe0481bf8cabd3a6ccc64.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
+    "neuron": {
+        "branch": "master",
+        "description": "Future-proof and simple-to-use notes system based on Zettelkasten.",
+        "homepage": "https://neuron.zettel.page",
+        "owner": "srid",
+        "repo": "neuron",
+        "rev": "fb1137fa9f902d068ee78e67fc2d8b0ae0035a3d",
+        "sha256": "1zcpmksf4m47a0fd18xwd56bywbb7k6scya2z44qbf928sa4zyss",
+        "type": "tarball",
+        "url": "https://github.com/srid/neuron/archive/fb1137fa9f902d068ee78e67fc2d8b0ae0035a3d.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    },
     "niv": {
         "branch": "master",
         "description": "Easy dependency management for Nix projects",

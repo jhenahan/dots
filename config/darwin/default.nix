@@ -7,10 +7,15 @@ in
 {
   imports = [ <home-manager/nix-darwin> ];
   nixpkgs.config = import ../nixpkgs;
+  nixpkgs.overlays = let path = ../../overlays; in with builtins;
+      map (n: import (path + ("/" + n)))
+          (filter (n: match ".*\\.nix" n != null ||
+                      pathExists (path + ("/" + n + "/default.nix")))
+                  (attrNames (readDir path)));
   home-manager.useUserPackages = true;
   home-manager.useGlobalPkgs = true;
   home-manager.users.${current_user} = { pkgs, ... }: {
-    home.packages = import ../packages.nix { inherit pkgs; };
+    home.packages= import ../packages.nix { inherit pkgs; };
   };
   #environment.shells = [ pkgs.fish ];
   services = {
