@@ -1,0 +1,225 @@
+#+PROPERTY: header-args :tangle ~/.emacs.d/the.el
+* The Heretic's Emacs
+** Throat Clearing
+*** Header
+    #+begin_src emacs-lisp
+      ;;; the.el --- All the actual config
+      ;; -*- lexical-binding: t -*-
+
+      ;;; Commentary:
+      ;; To see the outline of this file, run M-x outline-minor-mode and
+      ;; then press C-c @ C-t. To also show the top-level functions and
+      ;; variable declarations in each section, run M-x occur with the
+      ;; following query: ^;;;;* \|^(
+
+      ;;; Detect stale bytecode
+
+      ;; If Emacs version changed, the bytecode is no longer valid and we
+      ;; must recompile. Also, if the location of THE changed, our
+      ;; dotfile-finding functions are defined incorrectly and we must
+      ;; recompile.
+
+      ;;; Code:
+    #+end_src
+*** ~use-package~
+    #+begin_src emacs-lisp
+      (setq use-package-always-defer t)
+      (require 'use-package)
+    #+end_src
+*** UI Cleanup
+    No startup screen, no bars or icons, and some tweaks to make
+    [[https://github.com/koekeishiya/yabai][~yabai~]] happy.
+    #+begin_src emacs-lisp
+      (setq inhibit-startup-screen t)
+      (if (fboundp 'tool-bar-mode)   (tool-bar-mode   -1))
+      (if (fboundp 'menu-bar-mode)   (menu-bar-mode   -1))
+      (if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
+
+      (setq default-frame-alist '((font . "PragmataPro Liga-14")
+				  ;;(fullscreen . fullboth)
+				  ;;(undecorated . t)
+				  (horizontal-scroll-bars)
+				  (vertical-scroll-bars)))
+
+      (when (featurep 'ns)
+	(push '(ns-transparent-titlebar . t) default-frame-alist))
+
+      (setq frame-inhibit-implied-resize t)
+      (setq frame-resize-pixelwise t)
+    #+end_src
+
+*** Pretty Ligatures
+    #+begin_src emacs-lisp
+      (load (concat user-emacs-directory "pragmata"))
+      (global-prettify-symbols-mode)
+      (add-hook 'text-mode-hook 'prettify-hook)
+      (add-hook 'prog-mode-hook 'prettify-hook)
+    #+end_src
+
+** THE Utilities
+*** Config Groups
+    #+begin_src emacs-lisp
+      (defgroup the-hooks nil
+	"Startup hooks for THE."
+	:group 'the)
+
+      (defgroup the nil
+	"Customize your THE experience."
+	:prefix "the-"
+	:group 'emacs)
+    #+end_src
+*** Hooks
+    #+begin_src emacs-lisp
+      (defmacro the-defhook (name arglist hooks docstring &rest body)
+	"Define a function called NAME and add it to a hook.
+	ARGLIST is as in `defun'. HOOKS is a list of hooks to which to
+	add the function, or just a single hook. DOCSTRING and BODY are
+	as in `defun'."
+	(declare (indent 2)
+		 (doc-string 4))
+	(unless (listp hooks)
+	  (setq hooks (list hooks)))
+	(dolist (hook hooks)
+	  (unless (string-match-p "-\\(hook\\|functions\\)$" (symbol-name hook))
+	    (error "Symbol `%S' is not a hook" hook)))
+	(unless (stringp docstring)
+	  (error "The: no docstring provided for `the-defhook'"))
+	(let ((hooks-str (format "`%S'" (car hooks))))
+	  (dolist (hook (cdr hooks))
+	    (setq hooks-str (format "%s\nand `%S'" hooks-str hook)))
+	  `(progn
+	     (defun ,name ,arglist
+	       ,(format "%s\n\nThis function is for use in %s."
+			docstring hooks-str)
+	       ,@body)
+	     (dolist (hook ',hooks)
+	       (add-hook hook ',name)))))
+
+      (setq the--finalize-init-hook nil)
+
+      (defcustom the-after-init-hook nil
+	"Hook run after at the very end of init.
+	For use with `the-local-on-hook' in init.local.el."
+	:group 'the-hooks
+	:type 'hook)
+
+      (defvar the--hook-contents nil
+	"Alist mapping local init hooks to lists of forms.
+	This is used to embed local init hook code directly into the
+	init-file at the appropriate places during byte-compilation,
+	without breaking macro-expansion.")
+
+      (setq the--hook-contents nil)
+    #+end_src
+*** Operating System Detection
+    #+begin_src emacs-lisp
+      (defmacro the-operating-system-p (os)
+	"Return non-nil if OS corresponds to the current operating system.
+	Allowable values for OS (not quoted) are `macOS', `osx',
+	`windows', `linux', `unix'."
+	(pcase os
+	  (`unix `(not (memq system-type '(ms-dos windows-nt cygwin))))
+	  ((or `macOS `osx) `(eq system-type 'darwin))
+	  (`linux `(not (memq system-type
+			      '(darwin ms-dos windows-nt cygwin))))
+	  (`windows `(memq system-type '(ms-dos windows-nt cygwin)))))
+
+      (defmacro the-with-operating-system (os &rest body)
+	"If OS corresponds to the current operating system, eval and return BODY.
+	If not, return nil.
+	Allowable values for OS (not quoted) are `macOS', `osx',
+	`windows', `linux', `unix'."
+	(declare (indent 1))
+	`(when (the-operating-system-p ,os)
+	   ,@body))
+    #+end_src
+** Basics
+*** Modeline Cleanup
+    [[https://github.com/raxod502/blackout][~blackout~]] is the best modeline hygiene tool I've seen so far.
+    #+begin_src emacs-lisp
+      (use-package blackout
+	:demand t)
+    #+end_src
+*** Metadata Cleanup
+    Emacs and packages love to throw files all over the
+    place. [[https://github.com/emacscollective/no-littering][~no-littering~]] is a great tool for wrangling all the
+    junk. We also take their recommended settings for ~recentf~,
+    auto-saves, and customizations.
+    #+begin_src emacs-lisp
+      (use-package no-littering
+	:demand t)
+
+      (require 'recentf)
+      (add-to-list 'recentf-exclude no-littering-var-directory)
+      (add-to-list 'recentf-exclude no-littering-etc-directory)
+
+      (setq auto-save-file-name-transforms
+	    `((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))
+
+      (setq custom-file (no-littering-expand-etc-file-name "custom.el"))
+    #+end_src
+*** Correct Org
+    Emacs has an annoying habit of loading whatever the built-in
+    version of [[https://orgmode.org/][~org-mode~]] is, so we register our version of Org early
+    so anything which depends on Org won't get weird.
+    #+begin_src emacs-lisp
+      (use-package org
+	:ensure org-plus-contrib)
+    #+end_src
+*** Theme
+    [[https://github.com/morhetz/gruvbox][Gruvbox]] is the best theme, I will not be taking questions. The
+    [[https://github.com/hlissner/emacs-doom-themes][~doom-themes~]] package has one of the nicer implementations, and
+    also does some extra work to improve Org's use of the theme.
+    #+begin_src emacs-lisp
+      (use-package doom-themes
+	:demand t
+	:config
+	(load-theme 'doom-gruvbox t)
+	(require 'doom-themes-ext-org)
+	(doom-themes-org-config))
+    #+end_src
+*** TLS
+    Default [[https://www.gnutls.org/][GnuTLS]] settings in Emacs are /bad/.
+    #+begin_src emacs-lisp
+      (use-package gnutls
+	:ensure nil
+	:init
+	(setq gnutls-verify-error t
+	      gnutls-min-prime-bits 3072
+	      tls-checktrust gnutls-verify-error))
+    #+end_src
+*** Keybindings
+    We use [[https://github.com/emacs-evil/evil][~evil~]] for a baseline, [[https://github.com/noctuid/general.el][~general~]] for customizations, and
+    [[https://github.com/justbur/emacs-which-key][~which-key~]] for discovery.
+    #+begin_src emacs-lisp
+      (use-package which-key
+	:demand t
+	:config
+	(setq which-key-show-early-on-C-h t)
+	(which-key-mode 1)
+	:blackout t)
+
+      (use-package evil
+	:demand t
+	:config
+	(evil-mode 1))
+
+      (use-package general
+	:demand t)
+    #+end_src
+**** Utilities
+     Little macro to make binding mode-specific keys less of a chore.
+     #+begin_src emacs-lisp
+       (defmacro the-bind-key (key-name command which-key &optional predicate)
+	 "Bind a key in `the-keymap'.
+	  KEY-NAME, COMMAND, and WHICH-KEY are as in `general-define-key'.
+	  PREDICATE is any additional args to `general-define-key'."
+	 `(general-define-key
+	   :keymaps 'the-keymap
+	   ,key-name ,command :wk ,which-key ,predicate))
+     #+end_src
+** Closing
+   #+begin_src emacs-lisp
+     (provide 'the)
+     ;;; the.el ends here
+   #+end_src

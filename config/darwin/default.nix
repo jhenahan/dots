@@ -6,6 +6,17 @@ let
 in
 {
   imports = [ <home-manager/nix-darwin> ];
+  nix.nixPath = [
+    "darwin=$HOME/.config/nixpkgs/darwin"
+    "home-manager=$HOME/.config/nixpkgs/home-manager"
+    "darwin-config=$HOME/.config/nixpkgs/dotfiles/config/darwin"
+    "nixpkgs=$HOME/.config/nixpkgs/nixpkgs"
+  ];
+  system.build.applications = pkgs.lib.mkForce (pkgs.buildEnv {
+    name = "applications";
+    paths = config.environment.systemPackages ++ config.home-manager.users.${current_user}.home.packages;
+    pathsToLink = "/Applications";
+  });
   nixpkgs.config = import ../nixpkgs;
   nixpkgs.overlays = let path = ../../overlays; in with builtins;
       map (n: import (path + ("/" + n)))
@@ -14,9 +25,7 @@ in
                   (attrNames (readDir path)));
   home-manager.useUserPackages = true;
   home-manager.useGlobalPkgs = true;
-  home-manager.users.${current_user} = { pkgs, ... }: {
-    home.packages= import ../packages.nix { inherit pkgs; };
-  };
+  home-manager.users.${current_user} = import ../home;
   #environment.shells = [ pkgs.fish ];
   services = {
     nix-daemon.enable = true;
