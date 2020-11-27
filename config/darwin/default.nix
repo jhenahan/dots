@@ -26,7 +26,8 @@ in
   home-manager.useUserPackages = true;
   home-manager.useGlobalPkgs = true;
   home-manager.users.${current_user} = import ../home;
-  #environment.shells = [ pkgs.fish ];
+  programs.fish.enable = true;
+  environment.shells = [ pkgs.fish ];
   services = {
     nix-daemon.enable = true;
     activate-system.enable = true;
@@ -63,6 +64,7 @@ in
   };
   users.nix.configureBuildUsers = true;
   users.nix.nrBuildUsers = 32;
+  services.lorri.enable = true;
   #programs.fish = {
   #  enable = true;
   #};

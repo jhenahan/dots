@@ -9,6 +9,7 @@ in
   nix-prefetch-scripts
   cachix
   niv
+  direnv
   alacritty
   awscli
   coreutils
