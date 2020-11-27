@@ -1,4 +1,16 @@
 {
+    "alacritty-ligatures": {
+        "branch": "master",
+        "description": "A cross-platform, GPU-accelerated terminal emulator",
+        "homepage": "",
+        "owner": "zenixls2",
+        "repo": "alacritty",
+        "rev": "26479bb9f5c42e3294204c2923a67f3185dd061c",
+        "sha256": "0vjiv0g66h8myfbhgr4mmgg81p8nnmp5135b5vfw1ixqkyryis3z",
+        "type": "tarball",
+        "url": "https://github.com/zenixls2/alacritty/archive/26479bb9f5c42e3294204c2923a67f3185dd061c.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    },
     "darwin": {
         "branch": "master",
         "description": "nix modules for darwin",
