@@ -13,7 +13,4 @@
   
 (advice-add #'display-graphic-p :around
             #'the--advice-fix-display-graphic-p)
-(load
-  (expand-file-name "init.el" user-emacs-directory) nil 'nomessage 'nosuffix)
 
-(advice-remove #'display-graphic-p #'the--advice-fix-display-graphic-p)

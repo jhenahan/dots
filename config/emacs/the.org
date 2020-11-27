@@ -1,4 +1,4 @@
-#+PROPERTY: header-args :tangle ~/.emacs.d/the.el
+#+PROPERTY: header-args :tangle yes
 * The Heretic's Emacs
 ** Throat Clearing
 *** Header
@@ -23,8 +23,9 @@
     #+end_src
 *** ~use-package~
     #+begin_src emacs-lisp
+      (eval-when-compile
+        (require 'use-package))
       (setq use-package-always-defer t)
-      (require 'use-package)
     #+end_src
 *** UI Cleanup
     No startup screen, no bars or icons, and some tweaks to make
@@ -144,19 +145,23 @@
     Emacs and packages love to throw files all over the
     place. [[https://github.com/emacscollective/no-littering][~no-littering~]] is a great tool for wrangling all the
     junk. We also take their recommended settings for ~recentf~,
-    auto-saves, and customizations.
+    auto-saves, and customizations. We also disable backup files and
+    lockfiles because they're just noise.
     #+begin_src emacs-lisp
       (use-package no-littering
-	:demand t)
+	:demand t
+	:config
+	(require 'recentf)
+	(add-to-list 'recentf-exclude no-littering-var-directory)
+	(add-to-list 'recentf-exclude no-littering-etc-directory)
 
-      (require 'recentf)
-      (add-to-list 'recentf-exclude no-littering-var-directory)
-      (add-to-list 'recentf-exclude no-littering-etc-directory)
+	(setq auto-save-file-name-transforms
+	      `((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))
+	(setq custom-file (no-littering-expand-etc-file-name "custom.el")))
 
-      (setq auto-save-file-name-transforms
-	    `((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))
+      (setq make-backup-files nil)
 
-      (setq custom-file (no-littering-expand-etc-file-name "custom.el"))
+      (setq create-lockfiles nil)
     #+end_src
 *** Correct Org
     Emacs has an annoying habit of loading whatever the built-in
@@ -185,8 +190,7 @@
 	:ensure nil
 	:init
 	(setq gnutls-verify-error t
-	      gnutls-min-prime-bits 3072
-	      tls-checktrust gnutls-verify-error))
+	      gnutls-min-prime-bits 3072))
     #+end_src
 *** Keybindings
     We use [[https://github.com/emacs-evil/evil][~evil~]] for a baseline, [[https://github.com/noctuid/general.el][~general~]] for customizations, and
@@ -194,6 +198,7 @@
     #+begin_src emacs-lisp
       (use-package which-key
 	:demand t
+	:commands which-key-mode
 	:config
 	(setq which-key-show-early-on-C-h t)
 	(which-key-mode 1)
@@ -201,11 +206,18 @@
 
       (use-package evil
 	:demand t
+	:commands evil-mode
 	:config
 	(evil-mode 1))
 
       (use-package general
 	:demand t)
+    #+end_src
+*** Sanity
+    There are some weird defaults.
+    #+begin_src emacs-lisp
+      (setq sentence-end-double-space nil)
+      (setq-default indent-tabs-mode nil)
     #+end_src
 **** Utilities
      Little macro to make binding mode-specific keys less of a chore.
@@ -218,6 +230,85 @@
 	   :keymaps 'the-keymap
 	   ,key-name ,command :wk ,which-key ,predicate))
      #+end_src
+** Candidate Selection
+   We use [[https://github.com/raxod502/selectrum][~selectrum~]] and [[https://github.com/raxod502/prescient.el][~prescient~]] for candidate selection
+   (anything that uses ~completing-read~) and intelligent sorting of
+   those candidates.
+   #+begin_src emacs-lisp
+     (use-package selectrum
+       :commands selectrum-mode
+       :init
+       (selectrum-mode +1))
+
+     (use-package selectrum-prescient
+       :demand t
+       :after selectrum
+       :commands prescient-persist-mode selectrum-prescient-mode
+       :config
+       (setq prescient-history-length 1000)
+       (prescient-persist-mode +1)
+       (selectrum-prescient-mode +1))
+   #+end_src
+** Buffers
+*** Autorevert
+    I never want to be bitten by a buffer not reflecting the file on
+    disk.
+    #+begin_src emacs-lisp
+      (setq auto-revert-verbose nil)
+      (global-auto-revert-mode +1)
+    #+end_src
+*** Saveplace
+    It's nice to come back to a file and not have to figure out what
+    you were doing.
+    #+begin_src emacs-lisp
+      (save-place-mode +1)
+    #+end_src
+*** Search
+    [[https://github.com/raxod502/ctrlf][~ctrlf~]] is a simple incremental search.
+    #+begin_src emacs-lisp
+
+      (use-package ctrlf
+	:demand t
+	:config
+	(ctrlf-mode +1))
+    #+end_src
+*** Undo
+    I still don't really grok standard Emacs undo, so I use
+    [[http://www.dr-qubit.org/undo-tree.html][~undo-tree~]].
+    #+begin_src emacs-lisp
+      (use-package undo-tree
+        :demand t
+        :config
+        (global-undo-tree-mode +1)
+        (setq undo-tree-enable-undo-in-region nil)
+        :blackout t)
+    #+end_src
+** Writing
+*** Autofill
+    Save yourself from reflowing by hand. We also set auto-fill to
+    trigger on punctuation rather than only on whitespace.
+    #+begin_src emacs-lisp
+      (mapc
+       (lambda (c)
+	 (set-char-table-range auto-fill-chars c t))
+       "!-=+]};:'\",.?")
+      (add-hook 'text-mode-hook 'turn-on-auto-fill)
+    #+end_src
+** Direnv
+   Making LSP (and other tools) work sanely is much easier with
+   [[https://direnv.net/][~direnv~]].
+   #+begin_src emacs-lisp
+     (use-package direnv
+       :demand t
+       :config
+       (direnv-mode))
+   #+end_src
+** Programming
+*** Nix
+    #+begin_src emacs-lisp
+      (use-package nix-mode
+        :mode "\\.nix\\'")
+    #+end_src
 ** Closing
    #+begin_src emacs-lisp
      (provide 'the)
