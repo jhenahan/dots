@@ -1,16 +1,17 @@
 { config, lib, pkgs, ... }:
 let
   sources = import ../../nix/sources.nix;
-  home = builtins.getEnv "HOME";
   current_user = builtins.getEnv "USER";
+  home = builtins.getEnv "HOME";
 in
 {
   imports = [ <home-manager/nix-darwin> ];
+  users.users.${current_user}.home = home;
   nix.nixPath = [
-    "darwin=$HOME/.config/nixpkgs/darwin"
-    "home-manager=$HOME/.config/nixpkgs/home-manager"
-    "darwin-config=$HOME/.config/nixpkgs/dotfiles/config/darwin"
-    "nixpkgs=$HOME/.config/nixpkgs/nixpkgs"
+    "darwin=$HOME/.dots/darwin"
+    "home-manager=$HOME/.dots/home-manager"
+    "darwin-config=$HOME/.dots/dotfiles/config/darwin"
+    "nixpkgs=$HOME/.dots/nixpkgs"
   ];
   system.build.applications = pkgs.lib.mkForce (pkgs.buildEnv {
     name = "applications";

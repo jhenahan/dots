@@ -8,7 +8,7 @@ let
   pkgs = import nixpkgs {};
   buildDots = "$(nix-build --no-out-link)";
   switch = pkgs.writeShellScriptBin "switch" ''
-    CONFIG_DIR="$HOME/.config/nixpkgs"
+    CONFIG_DIR="$HOME/.dots"
     DOTFILES="$CONFIG_DIR/dotfiles"
     NIXPKGS="$CONFIG_DIR/nixpkgs"
     DARWIN="$CONFIG_DIR/darwin"

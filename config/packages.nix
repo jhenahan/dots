@@ -2,6 +2,7 @@
 with pkgs;
 let
   exe = haskell.lib.justStaticExecutables;
+  sources = import ../nix/sources.nix;
 in
 [
   neuron

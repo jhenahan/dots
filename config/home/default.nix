@@ -1,7 +1,7 @@
 { pkgs, ... }:
 let
-  home_directory = builtins.getEnv "HOME";
   sources = import ../../nix/sources.nix;
+  unstable = import sources.unstable {};
 in
 rec {
   home.packages = import ../packages.nix { inherit pkgs; };
@@ -29,11 +29,9 @@ rec {
     };
     starship = {
      enable = true;
+     package = unstable.starship;
      settings = {
-       format = ''
-         [┌─乱]$all
-         [└─λ]
-       '';
+       format = "┌─乱 $all\n└─λ ";
        add_newline = false;
      };
     };
