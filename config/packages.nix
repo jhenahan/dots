@@ -9,15 +9,12 @@ in
   nix-prefetch-scripts
   cachix
   niv
-  direnv
-  alacritty
   awscli
   coreutils
   parallel
   git-lfs
   (gitAndTools.git-crypt)
   (gitAndTools.git-imerge)
-  (gitAndTools.gitFull)
   (gitAndTools.bfg-repo-cleaner)
   (gitAndTools.gitflow)
   (gitAndTools.hub)
@@ -26,7 +23,6 @@ in
   patch
   patchutils
   pijul
-  bat
   curl
   exa
   fd
@@ -39,7 +35,6 @@ in
   gpgme
   htop
   imagemagickBig
-  jq
   less
   m-cli
   p7zip

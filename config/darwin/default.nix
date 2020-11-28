@@ -25,6 +25,8 @@ in
                   (attrNames (readDir path)));
   home-manager.useUserPackages = true;
   home-manager.useGlobalPkgs = true;
+  home-manager.verbose = true;
+  home-manager.backupFileExtension = "backup";
   home-manager.users.${current_user} = import ../home;
   programs.fish.enable = true;
   environment.shells = [ pkgs.fish ];
@@ -77,5 +79,5 @@ in
   #  defaultCommand = "${pkgs.fish}/bin/fish --login";
   #};
   programs.nix-index.enable = true;
-  system.stateVersion = 3;
+  system.stateVersion = 4;
 }

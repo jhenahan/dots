@@ -29,10 +29,10 @@
         "homepage": "",
         "owner": "nix-community",
         "repo": "emacs-overlay",
-        "rev": "c7701f202d7292a37574c918944037149ecb1f8c",
-        "sha256": "11dp18xgskg4m128kmmcc5j1rzck9z91xj2cksv561332iby22q3",
+        "rev": "6a59124fd51c7474e4669ce5e9a93673f5183cb5",
+        "sha256": "1xl8yk835rlxsrawnsphngkhbpz3rff82hpn20gr0sppcfa7lwi9",
         "type": "tarball",
-        "url": "https://github.com/nix-community/emacs-overlay/archive/c7701f202d7292a37574c918944037149ecb1f8c.tar.gz",
+        "url": "https://github.com/nix-community/emacs-overlay/archive/6a59124fd51c7474e4669ce5e9a93673f5183cb5.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "haskell.nix": {
@@ -41,10 +41,10 @@
         "homepage": "https://input-output-hk.github.io/haskell.nix",
         "owner": "input-output-hk",
         "repo": "haskell.nix",
-        "rev": "1dce3ffcb33da9e58e3685162bf9f5fd3d5f8a90",
-        "sha256": "0hl83vvnd7pli0j00ald4wbxrfqrlw4frixj66jnz7k1bk9jgc1n",
+        "rev": "9cef02c03a1bca5cc731c33952878ea1d123408f",
+        "sha256": "156vwx6nadkxkx4hkmq0id645gr0pb4vfqsj640gam0wmpvlncvc",
         "type": "tarball",
-        "url": "https://github.com/input-output-hk/haskell.nix/archive/1dce3ffcb33da9e58e3685162bf9f5fd3d5f8a90.tar.gz",
+        "url": "https://github.com/input-output-hk/haskell.nix/archive/9cef02c03a1bca5cc731c33952878ea1d123408f.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "home-manager": {
@@ -65,10 +65,10 @@
         "homepage": "https://neuron.zettel.page",
         "owner": "srid",
         "repo": "neuron",
-        "rev": "fb1137fa9f902d068ee78e67fc2d8b0ae0035a3d",
-        "sha256": "1zcpmksf4m47a0fd18xwd56bywbb7k6scya2z44qbf928sa4zyss",
+        "rev": "9197716ec9fc45103019f0eea4106a4e82820529",
+        "sha256": "1zqmms3z1i519l5j5k9nnk2066bk18vh6zbx57vz3r0l4nhd6rv7",
         "type": "tarball",
-        "url": "https://github.com/srid/neuron/archive/fb1137fa9f902d068ee78e67fc2d8b0ae0035a3d.tar.gz",
+        "url": "https://github.com/srid/neuron/archive/9197716ec9fc45103019f0eea4106a4e82820529.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "niv": {
@@ -84,15 +84,15 @@
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "nixpkgs": {
-        "branch": "20.09",
-        "description": "DEPRECATED! This is an obsolete, read-only mirror of the NixOS/nixpkgs repository.",
-        "homepage": "https://github.com/NixOS/nixpkgs",
+        "branch": "nixpkgs-unstable",
+        "description": "Nix Packages collection",
+        "homepage": "",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "cd63096d6d887d689543a0b97743d28995bc9bc3",
-        "sha256": "1wg61h4gndm3vcprdcg7rc4s1v3jkm5xd7lw8r2f67w502y94gcy",
+        "rev": "272744825d28f9cea96fe77fe685c8ba2af8eb12",
+        "sha256": "0sn0bcdlp8zm1jca73wcvm7p6miq6gp81kjkcl7b9gbwzcnxac7l",
         "type": "tarball",
-        "url": "https://github.com/NixOS/nixpkgs/archive/cd63096d6d887d689543a0b97743d28995bc9bc3.tar.gz",
+        "url": "https://github.com/NixOS/nixpkgs/archive/272744825d28f9cea96fe77fe685c8ba2af8eb12.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "nur": {
