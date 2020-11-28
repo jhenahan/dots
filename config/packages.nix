@@ -57,4 +57,5 @@ in
   terraform-docs
   wget
   youtube-dl
+  openssh
 ]

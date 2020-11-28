@@ -1,11 +1,11 @@
 { pkgs, ... }:
 let
   home_directory = builtins.getEnv "HOME";
+  sources = import ../../nix/sources.nix;
 in
 rec {
   home.packages = import ../packages.nix { inherit pkgs; };
   home = {
-    stateVersion = "20.09";
     file = {
       ".emacs.d/early-init.el".source = ../emacs/early-init.el;
       ".emacs.d/init.el".source = ../emacs/init.el;
@@ -14,6 +14,8 @@ rec {
     };
   };
   programs = {
+    home-manager.enable = true;
+    home-manager.path = sources.home-manager;
     man = {
       enable = true;
     };
