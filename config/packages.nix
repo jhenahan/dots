@@ -2,7 +2,15 @@
 with pkgs;
 let
   exe = haskell.lib.justStaticExecutables;
-  sources = import ../nix/sources.nix;
+  gitTools = with gitAndTools; [
+    git-crypt
+    git-imerge
+    bfg-repo-cleaner
+    gitflow
+    hub
+    tig
+    diff-so-fancy
+  ];
 in
 [
   neuron
@@ -14,13 +22,6 @@ in
   coreutils
   parallel
   git-lfs
-  (gitAndTools.git-crypt)
-  (gitAndTools.git-imerge)
-  (gitAndTools.bfg-repo-cleaner)
-  (gitAndTools.gitflow)
-  (gitAndTools.hub)
-  (gitAndTools.tig)
-  (gitAndTools.diff-so-fancy)
   patch
   patchutils
   pijul
@@ -59,4 +60,4 @@ in
   wget
   youtube-dl
   openssh
-]
+] ++ gitTools

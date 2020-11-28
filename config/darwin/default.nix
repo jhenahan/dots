@@ -1,6 +1,5 @@
 { config, lib, pkgs, ... }:
 let
-  sources = import ../../nix/sources.nix;
   current_user = builtins.getEnv "USER";
   home = builtins.getEnv "HOME";
 in
@@ -19,14 +18,15 @@ in
     pathsToLink = "/Applications";
   });
   nixpkgs.config = import ../nixpkgs;
-  nixpkgs.overlays = let path = ../../overlays; in with builtins;
-      map (n: import (path + ("/" + n)))
-          (filter (n: match ".*\\.nix" n != null ||
-                      pathExists (path + ("/" + n + "/default.nix")))
-                  (attrNames (readDir path)));
+  nixpkgs.overlays = let path = ../../overlays; in
+    with builtins;
+    map (n: import (path + ("/" + n)))
+      (filter
+        (n: match ".*\\.nix" n != null ||
+          pathExists (path + ("/" + n + "/default.nix")))
+        (attrNames (readDir path)));
   home-manager.useUserPackages = true;
   home-manager.useGlobalPkgs = true;
-  home-manager.verbose = true;
   home-manager.backupFileExtension = "backup";
   home-manager.users.${current_user} = import ../home;
   programs.fish.enable = true;

@@ -1,7 +1,4 @@
 { pkgs, ... }:
-let
-  sources = import ../../nix/sources.nix;
-in
 rec {
   home.packages = import ../packages.nix { inherit pkgs; };
   home = {
@@ -13,8 +10,6 @@ rec {
     };
   };
   programs = {
-    home-manager.enable = true;
-    home-manager.path = sources.home-manager;
     man = {
       enable = true;
     };
@@ -26,20 +21,11 @@ rec {
     jq = {
       enable = true;
     };
-    starship = {
-      enable = true;
-      settings = {
-        format = "┌─乱 $all";
-        character = {
-          format = "└─$symbol ";
-          success_symbol = "[λ](green)";
-          error_symbol = "[✘](red)";
-        };
-      };
-    };
+    starship = import ./starship.nix;
     ssh = import ./ssh.nix;
     direnv = {
       enable = true;
+      enableNixDirenvIntegration = true;
     };
     skim = {
       enable = true;
@@ -56,7 +42,7 @@ rec {
       enable = true;
     };
     git = import ./git.nix { inherit pkgs; };
-    };
+  };
   xdg = {
     configFile."gnupg/gpg-agent.conf".text = ''
       enable-ssh-support
@@ -75,4 +61,3 @@ rec {
     };
   };
 }
-

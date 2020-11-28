@@ -15,7 +15,7 @@ self: super:
   });
   myEmacs = super.emacsWithPackagesFromUsePackage {
     package = self.emacsGcc;
-    config  = ../config/emacs/the.org;
+    config = ../config/emacs/the.org;
     alwaysEnsure = true;
     alwaysTangle = true;
     extraEmacsPackages = epkgs: [

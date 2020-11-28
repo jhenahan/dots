@@ -1,7 +1,7 @@
-self: super:
-let
-  sources = import ../nix/sources.nix;
-in
+#let
+#  sources = import ../nix/sources.nix;
+#in
+_: super:
 {
   # .oO someday
   #alacritty = super.alacritty.overrideAttrs (old: rec {

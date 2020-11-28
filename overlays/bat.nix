@@ -1,8 +1,8 @@
 let
   sources = import ../nix/sources.nix;
-  unstable = import sources.unstable { overlays = []; };
+  unstable = import sources.unstable { overlays = [ ]; };
 in
-self: super:
+_: _:
 {
   inherit unstable;
   bat = unstable.bat;
