@@ -1,4 +1,4 @@
-{ pkgs, programs, xdg, ... }:
+{ pkgs, programs, ... }:
 {
   enable = true;
   shellAliases = rec {
