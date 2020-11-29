@@ -29,7 +29,7 @@
     #+end_src
 *** UI Cleanup
     No startup screen, no bars or icons, and some tweaks to make
-    [[https://github.com/koekeishiya/yabai][~yabai~]] happy.
+    [[https://github.com/koekeishiya/yabai][yabai]] happy.
     #+begin_src emacs-lisp
       (setq inhibit-startup-screen t)
       (if (fboundp 'tool-bar-mode)   (tool-bar-mode   -1))
@@ -136,14 +136,14 @@
     #+end_src
 ** Basics
 *** Modeline Cleanup
-    [[https://github.com/raxod502/blackout][~blackout~]] is the best modeline hygiene tool I've seen so far.
+    [[https://github.com/raxod502/blackout][blackout]] is the best modeline hygiene tool I've seen so far.
     #+begin_src emacs-lisp
       (use-package blackout
 	:demand t)
     #+end_src
 *** Metadata Cleanup
     Emacs and packages love to throw files all over the
-    place. [[https://github.com/emacscollective/no-littering][~no-littering~]] is a great tool for wrangling all the
+    place. [[https://github.com/emacscollective/no-littering][no-littering]] is a great tool for wrangling all the
     junk. We also take their recommended settings for ~recentf~,
     auto-saves, and customizations. We also disable backup files and
     lockfiles because they're just noise.
@@ -165,7 +165,7 @@
     #+end_src
 *** Correct Org
     Emacs has an annoying habit of loading whatever the built-in
-    version of [[https://orgmode.org/][~org-mode~]] is, so we register our version of Org early
+    version of [[https://orgmode.org/][org-mode]] is, so we register our version of Org early
     so anything which depends on Org won't get weird.
     #+begin_src emacs-lisp
       (use-package org
@@ -173,7 +173,7 @@
     #+end_src
 *** Theme
     [[https://github.com/morhetz/gruvbox][Gruvbox]] is the best theme, I will not be taking questions. The
-    [[https://github.com/hlissner/emacs-doom-themes][~doom-themes~]] package has one of the nicer implementations, and
+    [[https://github.com/hlissner/emacs-doom-themes][doom-themes]] package has one of the nicer implementations, and
     also does some extra work to improve Org's use of the theme.
     #+begin_src emacs-lisp
       (use-package doom-themes
@@ -193,8 +193,8 @@
 	      gnutls-min-prime-bits 3072))
     #+end_src
 *** Keybindings
-    We use [[https://github.com/emacs-evil/evil][~evil~]] for a baseline, [[https://github.com/noctuid/general.el][~general~]] for customizations, and
-    [[https://github.com/justbur/emacs-which-key][~which-key~]] for discovery.
+    We use [[https://github.com/emacs-evil/evil][evil]] for a baseline, [[https://github.com/noctuid/general.el][general]] for customizations, and
+    [[https://github.com/justbur/emacs-which-key][which-key]] for discovery.
     #+begin_src emacs-lisp
       (use-package which-key
 	:demand t
@@ -218,6 +218,7 @@
     #+begin_src emacs-lisp
       (setq sentence-end-double-space nil)
       (setq-default indent-tabs-mode nil)
+      (setq kill-do-not-save-duplicates t)
     #+end_src
 **** Utilities
      Little macro to make binding mode-specific keys less of a chore.
@@ -231,7 +232,7 @@
 	   ,key-name ,command :wk ,which-key ,predicate))
      #+end_src
 ** Candidate Selection
-   We use [[https://github.com/raxod502/selectrum][~selectrum~]] and [[https://github.com/raxod502/prescient.el][~prescient~]] for candidate selection
+   We use [[https://github.com/raxod502/selectrum][selectrum]] and [[https://github.com/raxod502/prescient.el][prescient]] for candidate selection
    (anything that uses ~completing-read~) and intelligent sorting of
    those candidates.
    #+begin_src emacs-lisp
@@ -249,6 +250,10 @@
        (prescient-persist-mode +1)
        (selectrum-prescient-mode +1))
    #+end_src
+** Git
+   #+begin_src emacs-lisp
+     (use-package magit)
+   #+end_src
 ** Buffers
 *** Autorevert
     I never want to be bitten by a buffer not reflecting the file on
@@ -264,7 +269,7 @@
       (save-place-mode +1)
     #+end_src
 *** Search
-    [[https://github.com/raxod502/ctrlf][~ctrlf~]] is a simple incremental search.
+    [[https://github.com/raxod502/ctrlf][ctrlf]] is a simple incremental search.
     #+begin_src emacs-lisp
 
       (use-package ctrlf
@@ -274,7 +279,7 @@
     #+end_src
 *** Undo
     I still don't really grok standard Emacs undo, so I use
-    [[http://www.dr-qubit.org/undo-tree.html][~undo-tree~]].
+    [[http://www.dr-qubit.org/undo-tree.html][undo-tree]].
     #+begin_src emacs-lisp
       (use-package undo-tree
         :demand t
@@ -296,19 +301,125 @@
     #+end_src
 ** Direnv
    Making LSP (and other tools) work sanely is much easier with
-   [[https://direnv.net/][~direnv~]].
+   [[https://direnv.net/][direnv]].
    #+begin_src emacs-lisp
      (use-package direnv
        :demand t
        :config
        (direnv-mode))
    #+end_src
-** Programming
-*** Nix
+** Completion
+   #+begin_src emacs-lisp
+     (use-package company
+       :demand t
+       :config
+       (setq company-idle-delay 0.1
+             company-minimum-prefix-length 1
+             company-tooltip-align-annotations t
+             company-require-match 'never
+             company-global-modes '(not erc-mode message-mode help-mode gud-mode)
+             company-dabbrev-other-buffers nil
+             company-dabbrev-ignore-case nil
+             company-dabbrev-downcase nil)
+       (require 'company-tng)
+       (global-company-mode +1)
+       (company-tng-mode +1)
+       :blackout "Comp")
+
+     (use-package company-prescient
+       :demand t
+       :after company
+       :config
+       ;; Use `prescient' for Company menus.
+       (company-prescient-mode +1))
+   #+end_src
+** Checking
+*** Flycheck
     #+begin_src emacs-lisp
-      (use-package nix-mode
-        :mode "\\.nix\\'")
+      (use-package flycheck
+        :demand t
+        :config
+        (global-flycheck-mode +1)
+        :blackout t)
     #+end_src
+** Programming
+*** Language Server Protocol
+    #+begin_src emacs-lisp
+      (use-package lsp-mode
+        :commands (lsp lsp-deferred)
+        :hook (lsp-mode . lsp-enable-which-key-integration)
+        :init
+        (setq gc-cons-threshold 100000000)
+        (setq read-process-output-max (* 1024 1024 10))
+        (setq lsp-completion-provider :capf)
+        (setq lsp-enable-snippet t)
+        (setq lsp-enable-indentation t)
+        (setq lsp-semantic-highlighting t)
+        (setq lsp-auto-configure t)
+        :blackout "LSP")
+
+      (use-package lsp-ui
+        :hook (lsp-mode . lsp-ui-mode))
+
+      (use-package yasnippet)
+    #+end_src
+*** Debug Adapter Protocol
+    #+begin_src emacs-lisp
+      (use-package posframe)
+
+      (use-package dap-mode
+        :hook
+        (lsp-mode . dap-mode)
+        (lsp-mode . dap-ui-mode))
+    #+end_src
+*** Languages
+**** LaTeX
+     #+begin_src emacs-lisp
+       (use-package tex
+         :hook ((LaTeX-mode TeX-mode) . lsp-deferred)
+         :ensure auctex
+         :demand t)
+     #+end_src
+**** Nix
+     #+begin_src emacs-lisp
+       (use-package nix-mode
+         :mode "\\.nix\\'")
+     #+end_src
+**** Scala
+     #+begin_src emacs-lisp
+       (use-package scala-mode
+         :interpreter
+         ("scala" . scala-mode)
+         :hook (scala-mode . lsp))
+
+       (use-package sbt-mode
+         :commands sbt-start sbt-command
+         :config
+         ;; WORKAROUND: https://github.com/ensime/emacs-sbt-mode/issues/31
+         ;; allows using SPACE when in the minibuffer
+         (substitute-key-definition
+          'minibuffer-complete-word
+          'self-insert-command
+          minibuffer-local-completion-map)
+          ;; sbt-supershell kills sbt-mode:  https://github.com/hvesalai/emacs-sbt-mode/issues/152
+          (setq sbt:program-options '("-Dsbt.supershell=false")))
+
+       (use-package lsp-metals
+         :init
+         (setq lsp-metals-treeview-show-when-views-received t))
+     #+end_src
+**** Haskell
+     #+begin_src emacs-lisp
+       (use-package haskell-mode
+         :mode (("\\.hs\\'"    . haskell-mode)
+                ("\\.cabal\\'" . haskell-cabal-mode)
+                ("\\.hcr\\'"   . haskell-core-mode))
+         :hook (haskell-mode . lsp-deferred))
+
+       (use-package lsp-haskell
+         :init
+         (setq lsp-haskell-server-path "haskell-language-server"))
+     #+end_src
 ** Closing
    #+begin_src emacs-lisp
      (provide 'the)

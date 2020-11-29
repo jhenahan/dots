@@ -11,8 +11,13 @@ let
     tig
     diff-so-fancy
   ];
+  languageServers = [
+    texlab
+    metals
+  ];
 in
 [
+  texFull
   neuron
   myEmacs
   nix-prefetch-scripts
@@ -60,4 +65,4 @@ in
   wget
   youtube-dl
   openssh
-] ++ gitTools
+] ++ gitTools ++ languageServers
