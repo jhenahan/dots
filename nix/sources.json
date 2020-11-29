@@ -23,6 +23,18 @@
         "url": "https://github.com/LnL7/nix-darwin/archive/6c6eb8ace6599a33eeb33e28453a601ab02e523e.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
+    "dhall": {
+        "branch": "master",
+        "description": "Derivations for easily downloading Dhall binaries and putting them to use.",
+        "homepage": "",
+        "owner": "jhenahan",
+        "repo": "easy-dhall-nix",
+        "rev": "368a68323e0c42168f8c5750ee2511fc6e7c303c",
+        "sha256": "14zlxg8rv0kgp0dhpvxw838myyxrw7amgw4m99yrxcl3yv6wywj0",
+        "type": "tarball",
+        "url": "https://github.com/jhenahan/easy-dhall-nix/archive/368a68323e0c42168f8c5750ee2511fc6e7c303c.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    },
     "emacs-overlay": {
         "branch": "master",
         "description": "Bleeding edge emacs overlay [maintainer=@adisbladis] ",

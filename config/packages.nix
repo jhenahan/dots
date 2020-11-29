@@ -14,9 +14,20 @@ let
   languageServers = [
     texlab
     metals
+    dhall-lsp
+    yaml-language-server
+    terraform-ls
   ];
 in
 [
+  alks
+  nodePackages.node2nix
+  dhall
+  dhall-bash
+  dhall-docs
+  dhall-json
+  dhall-nix
+  dhall-yaml
   texFull
   neuron
   myEmacs

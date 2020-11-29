@@ -420,6 +420,12 @@
          :init
          (setq lsp-haskell-server-path "haskell-language-server"))
      #+end_src
+**** Dhall
+     #+begin_src emacs-lisp
+       (use-package dhall-mode
+         :mode "\\.dhall\\'"
+         :hook (dhall-mode . lsp))
+     #+end_src
 ** Closing
    #+begin_src emacs-lisp
      (provide 'the)
