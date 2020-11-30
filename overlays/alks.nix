@@ -1,4 +1,4 @@
-self: super:
+_: super:
 {
   alks = (super.callPackage ../packages/alks { }).alks;
 }

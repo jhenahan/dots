@@ -1,4 +1,4 @@
-self: super:
+_: super:
 {
   texFull = super.texlive.combine {
     inherit (super.texlive) scheme-full texdoc latex2e-help-texinfo;

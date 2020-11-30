@@ -2,7 +2,7 @@ let
   sources = import ../nix/sources.nix;
   edn = import sources.dhall { };
 in
-self: super:
+_: _:
 {
   dhall = edn.dhall-simple;
   dhall-bash = edn.dhall-bash-simple;

@@ -2,15 +2,19 @@
 {
   enable = true;
   shellAliases = rec {
-    ls = "exa";
+    ls = "br -sdp";
     l = ls;
-    ll = "exa -al";
     e = "$EDITOR";
     E = "sudo -e";
     cat = "bat";
+    ti = "hyperfine";
+    loc = "tokei";
+    ps = "procs";
+    top = "btm";
     ".." = "cd ..";
     "..." = "cd ../..";
     "...." = "cd ../../..";
+    sw = "pushd ~/src/dots; nix-shell --run 'switch'; popd";
   };
   loginShellInit = ''
     set fish_greeting
@@ -30,7 +34,7 @@
     set -x FONTCONFIG_PATH "$HOME/.config/fontconfig";
     set -x FONTCONFIG_FILE "$HOME/.config/fontconfig/fonts.conf";
     set -x ALTERNATE_EDITOR "";
-    set -x EDITOR "${pkgs.myEmacs}/bin/emacsclient -cn";
+    set -x EDITOR "${pkgs.myEmacs}/bin/emacsclient -c";
     set -x EMAIL "${programs.git.userEmail}";
     set -x LC_CTYPE "en_US.UTF-8";
     set -x LESS "-FRSXM";

@@ -16,8 +16,10 @@ rec {
     noti = {
       enable = true;
     };
+    bash.enable = true;
+    zsh.enable = true;
     fish = import ./fish.nix { inherit pkgs programs; };
-    alacritty = import ./alacritty.nix;
+    alacritty = import ./alacritty.nix { inherit pkgs; };
     jq = {
       enable = true;
     };
@@ -42,6 +44,27 @@ rec {
       enable = true;
     };
     git = import ./git.nix { inherit pkgs; };
+    tmux = {
+      enable = true;
+      clock24 = true;
+      disableConfirmationPrompt = true;
+      historyLimit = 10000;
+      terminal = "screen-256color";
+      plugins = with pkgs.tmuxPlugins; [
+        logging
+        yank
+        open
+        copycat
+        gruvbox
+        battery
+        cpu
+        pain-control
+        prefix-highlight
+      ];
+      extraConfig = ''
+        setw -g mouse on
+      '';
+    };
   };
   xdg = {
     configFile."gnupg/gpg-agent.conf".text = ''
@@ -59,5 +82,6 @@ rec {
       '';
       executable = true;
     };
+    configFile."procs/config.toml".source = ./files/procs.toml;
   };
 }

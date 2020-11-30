@@ -2,78 +2,118 @@
 with pkgs;
 let
   exe = haskell.lib.justStaticExecutables;
-  gitTools = with gitAndTools; [
-    git-crypt
-    git-imerge
-    bfg-repo-cleaner
-    gitflow
-    hub
-    tig
-    diff-so-fancy
+  apps = [
+    Firefox
+    Dash
+  ];
+  tools = {
+    rust = [
+      bottom
+      fd
+      hyperfine
+      procs
+      ripgrep
+      sd
+      tokei
+      xsv
+    ];
+    dhall = [
+      dhall
+      dhall-bash
+      dhall-docs
+      dhall-json
+      dhall-nix
+      dhall-yaml
+    ];
+    vc = with gitAndTools; [
+      bfg-repo-cleaner
+      diff-so-fancy
+      git-crypt
+      git-imerge
+      git-lfs
+      gitflow
+      hub
+      tig
+      pijul
+    ];
+    nix = [
+      cachix
+      niv
+      nix-prefetch-scripts
+      nodePackages.node2nix
+      nixfmt
+    ];
+
+    gnu = [
+      coreutils
+      findutils
+      gawk
+      gnugrep
+      gnused
+      gnutar
+      parallel
+      patch
+      patchutils
+      renameutils
+      less
+    ];
+    work = [
+      alks
+      awscli
+    ];
+    network = [
+      httpie
+      dnsutils
+      netcat
+      openssh
+      curl
+      wget
+      youtube-dl
+      rsync
+    ];
+  };
+  archive = [
+    p7zip
+    unrar
+    unzip
+    zip
+    xz
   ];
   languageServers = [
-    texlab
-    metals
     dhall-lsp
-    yaml-language-server
+    metals
     terraform-ls
+    terraform-lsp
+    texlab
+    yaml-language-server
+  ];
+  other = [
+    bash
+    emacs-all-the-icons-fonts
+    texFull
+    neuron
+    myEmacs
+    gnupg
+    gpgme
+    imagemagickBig
+    m-cli
+    paperkey
+    qrencode
+    rlwrap
+    xquartz
+    terraform-docs
   ];
 in
-[
-  alks
-  nodePackages.node2nix
-  dhall
-  dhall-bash
-  dhall-docs
-  dhall-json
-  dhall-nix
-  dhall-yaml
-  texFull
-  neuron
-  myEmacs
-  nix-prefetch-scripts
-  cachix
-  niv
-  awscli
-  coreutils
-  parallel
-  git-lfs
-  patch
-  patchutils
-  pijul
-  curl
-  exa
-  fd
-  findutils
-  gawk
-  gnugrep
-  gnupg
-  gnused
-  gnutar
-  gpgme
-  htop
-  imagemagickBig
-  less
-  m-cli
-  p7zip
-  paperkey
-  qrencode
-  renameutils
-  ripgrep
-  rlwrap
-  time
-  unrar
-  unzip
-  xquartz
-  xsv
-  xz
-  zip
-  dnsutils
-  netcat
-  openssh
-  rsync
-  terraform-docs
-  wget
-  youtube-dl
-  openssh
-] ++ gitTools ++ languageServers
+pkgs.lib.lists.flatten [
+  apps
+  tools.rust
+  tools.dhall
+  tools.vc
+  tools.nix
+  tools.gnu
+  tools.work
+  tools.network
+  archive
+  languageServers
+  other
+]
