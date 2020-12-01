@@ -4,7 +4,7 @@
   shellAliases = rec {
     ls = "br -sdp";
     l = ls;
-    e = "$EDITOR";
+    e = "${pkgs.myEmacs}/bin/emacsclient -c";
     E = "sudo -e";
     cat = "bat";
     ti = "hyperfine";
@@ -35,6 +35,7 @@
     set -x FONTCONFIG_FILE "$HOME/.config/fontconfig/fonts.conf";
     set -x ALTERNATE_EDITOR "";
     set -x EDITOR "${pkgs.myEmacs}/bin/emacsclient -c";
+    set -x VISUAL $EDITOR
     set -x EMAIL "${programs.git.userEmail}";
     set -x LC_CTYPE "en_US.UTF-8";
     set -x LESS "-FRSXM";
