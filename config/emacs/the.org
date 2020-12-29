@@ -213,8 +213,15 @@ We use [[https://github.com/emacs-evil/evil][evil]] for a baseline, [[https://gi
   (use-package evil
     :demand t
     :commands evil-mode
+    :init
+    (setq evil-want-keybinding nil)
     :config
     (evil-mode 1))
+
+  (use-package evil-collection
+    :demand t
+    :custom (evil-collection-setup-minibuffer t)
+    :init (evil-collection-init))
 
   (use-package general
     :demand t)
@@ -304,6 +311,11 @@ trigger on punctuation rather than only on whitespace.
      (set-char-table-range auto-fill-chars c t))
    "!-=+]};:'\",.?")
   (add-hook 'text-mode-hook 'turn-on-auto-fill)
+#+end_src
+** Reading
+*** Speed Reading
+#+begin_src emacs-lisp
+  (use-package spray)
 #+end_src
 ** Direnv
 Making LSP (and other tools) work sanely is much easier with
@@ -562,6 +574,15 @@ Making LSP (and other tools) work sanely is much easier with
     (setq doom-modeline-height 1)
     (set-face-attribute 'mode-line nil :family "PragmataPro Liga" :height 140)
     (set-face-attribute 'mode-line-inactive nil :family "PragmataPro Liga" :height 140))
+#+end_src
+** Clients
+#+begin_src emacs-lisp
+  (use-package elpher
+    :init
+    (defun the-elpher-hook ()
+      (make-local-variable 'gnutls-verify-error)
+      (setq gnutls-verify-error nil))
+    :hook (elpher-mode . the-elpher-hook))
 #+end_src
 
 ** Closing

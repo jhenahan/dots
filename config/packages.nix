@@ -25,6 +25,7 @@ let
       dhall-nix
       dhall-yaml
     ];
+    haskell = [ pandoc ];
     vc = with gitAndTools; [
       bfg-repo-cleaner
       diff-so-fancy
@@ -43,7 +44,6 @@ let
       nodePackages.node2nix
       nixfmt
     ];
-
     gnu = [
       coreutils
       findutils
@@ -88,6 +88,7 @@ let
     yaml-language-server
   ];
   other = [
+    mill
     bash
     emacs-all-the-icons-fonts
     texFull
@@ -102,12 +103,14 @@ let
     rlwrap
     xquartz
     terraform-docs
+    bitwarden-cli
   ];
 in
 pkgs.lib.lists.flatten [
   apps
   tools.rust
   tools.dhall
+  tools.haskell
   tools.vc
   tools.nix
   tools.gnu

@@ -36,7 +36,7 @@ in
     activate-system.enable = true;
   };
   nix = {
-    package = pkgs.nixUnstable;
+    package = pkgs.nixStable;
     trustedUsers = [
       "root"
       current_user
