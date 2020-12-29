@@ -16,18 +16,18 @@ let
     ${pkgs.nixpkgs-fmt}/bin/nixpkgs-fmt ${files} "$@"
   '';
   switch = pkgs.writeShellScriptBin "switch" ''
-    CONFIG_DIR="$HOME/.dots"
-    DOTFILES="$CONFIG_DIR/dotfiles"
-    NIXPKGS="$CONFIG_DIR/nixpkgs"
-    DARWIN="$CONFIG_DIR/darwin"
-    HOME_MANAGER="$CONFIG_DIR/home-manager"
+    WORKDIR="$HOME/.dots"
+    DOTFILES="$WORKDIR/dotfiles"
+    NIXPKGS="$WORKDIR/nixpkgs"
+    DARWIN="$WORKDIR/darwin"
+    HOME_MANAGER="$WORKDIR/home-manager"
     DARWIN_CONFIG="$DOTFILES/config/darwin"
     OVERLAYS="$DOTFILES/overlays"
-    mkdir -p "$CONFIG_DIR"
-    ln -snf ${buildDots} "$DOTFILES"
-    ln -snf ${nixpkgs} "$NIXPKGS"
-    ln -snf ${darwin} "$DARWIN"
-    ln -snf ${home-manager} "$HOME_MANAGER"
+    mkdir -p "$WORKDIR"
+    ln -snfv ${buildDots} "$DOTFILES"
+    ln -snfv ${nixpkgs} "$NIXPKGS"
+    ln -snfv ${darwin} "$DARWIN"
+    ln -snfv ${home-manager} "$HOME_MANAGER"
     echo >&2 "Formatting..."
     format
     echo >&2 "Linting..."
@@ -44,12 +44,6 @@ let
           -I "home-manager=$HOME_MANAGER"
     fi
     echo >&2 "Switching to new configuration..."
-    echo darwin-rebuild switch --show-trace \
-          -I "darwin=$DARWIN" \
-          -I "darwin-config=$DARWIN_CONFIG" \
-          -I "nixpkgs=$NIXPKGS" \
-          -I "nixpkgs-overlays=$OVERLAYS" \
-          -I "home-manager=$HOME_MANAGER"
     darwin-rebuild switch --show-trace \
           -I "darwin=$DARWIN" \
           -I "darwin-config=$DARWIN_CONFIG" \
