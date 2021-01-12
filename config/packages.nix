@@ -60,6 +60,7 @@ let
     work = [
       alks
       awscli
+      maven
     ];
     network = [
       httpie
@@ -104,6 +105,7 @@ let
     xquartz
     terraform-docs
     bitwarden-cli
+    html-tidy
   ];
 in
 pkgs.lib.lists.flatten [
