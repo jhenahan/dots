@@ -17,9 +17,6 @@ loading the init-file twice if it were not for this variable.")
   
   (setq package-enable-at-startup nil)
   
-  (setq custom-file (expand-file-name
-  		   (format "custom-%d-%d.el" (emacs-pid) (random))
-  		   temporary-file-directory))
   (if (version< emacs-version the-minimum-emacs-version)
       (error (concat "THE Emacs requires at least Emacs %s, "
   		   "but you are running Emacs %s")
@@ -43,6 +40,5 @@ loading the init-file twice if it were not for this variable.")
         (delete-file el-file))
       (org-babel-load-file the-lib-file)
       (run-hooks 'the--finalize-init-hook)
-      (advice-remove #'display-graphic-p #'the--advice-fix-display-graphic-p)
     )
   ))

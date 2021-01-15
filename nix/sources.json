@@ -27,24 +27,24 @@
         "branch": "master",
         "description": "Derivations for easily downloading Dhall binaries and putting them to use.",
         "homepage": "",
-        "owner": "jhenahan",
+        "owner": "justinwoo",
         "repo": "easy-dhall-nix",
-        "rev": "8ebf6bfc33ad571c45cd4785a6e4b5175e0854f7",
-        "sha256": "1mcinxjxai9hic80jfp26a134gv1dw3mfqjjhsslk27lq0axi2lj",
+        "rev": "eae7f64c4d6c70681e5a56c84198236930ba425e",
+        "sha256": "1y2x15v8a679vlpxazjpibfwajp6zph60f8wjcm4xflbvazk0dx7",
         "type": "tarball",
-        "url": "https://github.com/jhenahan/easy-dhall-nix/archive/8ebf6bfc33ad571c45cd4785a6e4b5175e0854f7.tar.gz",
+        "url": "https://github.com/justinwoo/easy-dhall-nix/archive/eae7f64c4d6c70681e5a56c84198236930ba425e.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "emacs-overlay": {
-        "branch": "master",
+        "branch": "revert-package-el-changes",
         "description": "Bleeding edge emacs overlay [maintainer=@adisbladis] ",
         "homepage": "",
         "owner": "jhenahan",
         "repo": "emacs-overlay",
-        "rev": "aec60faf3bc586134c44160866d25c6cb8b690ab",
-        "sha256": "04hsqc5ppqz0lcbli86dpa9qadjii7sq5c8pq43hk0l6bvy65v5l",
+        "rev": "40d95bd24ab1921a367cb56a1b8df39b88a1f2b2",
+        "sha256": "1ypxlxcp633nnvp16rzmwky1d93dn5drv3gcjribb0ksx0nhq4df",
         "type": "tarball",
-        "url": "https://github.com/jhenahan/emacs-overlay/archive/aec60faf3bc586134c44160866d25c6cb8b690ab.tar.gz",
+        "url": "https://github.com/jhenahan/emacs-overlay/archive/40d95bd24ab1921a367cb56a1b8df39b88a1f2b2.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "haskell.nix": {
@@ -53,10 +53,10 @@
         "homepage": "https://input-output-hk.github.io/haskell.nix",
         "owner": "input-output-hk",
         "repo": "haskell.nix",
-        "rev": "cee602e64b466a4212f1c5f5e66553b48bacf88c",
-        "sha256": "1zhlldhj92bbbfhw7l3npw13hg1x12wah9pywpgcgf5whwvwxd8y",
+        "rev": "eb0b336c721b32a03502ce12526fe4d7d17559b2",
+        "sha256": "1zhm3y8rrp42g4vf6xmcakw6b05w9wqgdmm9f1bgp2hw42lfqii4",
         "type": "tarball",
-        "url": "https://github.com/input-output-hk/haskell.nix/archive/cee602e64b466a4212f1c5f5e66553b48bacf88c.tar.gz",
+        "url": "https://github.com/input-output-hk/haskell.nix/archive/eb0b336c721b32a03502ce12526fe4d7d17559b2.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "home-manager": {
@@ -77,10 +77,10 @@
         "homepage": "https://neuron.zettel.page",
         "owner": "srid",
         "repo": "neuron",
-        "rev": "aabae6a0df7b4be2a9ed1192aac206fdfea1cec8",
-        "sha256": "1j88394jzldyr63rnga2sf8yppawsprppwrcrwx5c398nykrkxhr",
+        "rev": "5c67c037099f08ca810d970618d388a816362de2",
+        "sha256": "1agamd75zd40ybb0lzsjnzlcb4xc5myh6331sjd5pwlksff1k773",
         "type": "tarball",
-        "url": "https://github.com/srid/neuron/archive/aabae6a0df7b4be2a9ed1192aac206fdfea1cec8.tar.gz",
+        "url": "https://github.com/srid/neuron/archive/5c67c037099f08ca810d970618d388a816362de2.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "niv": {
@@ -89,10 +89,10 @@
         "homepage": "https://github.com/nmattia/niv",
         "owner": "nmattia",
         "repo": "niv",
-        "rev": "ba57d5a29b4e0f2085917010380ef3ddc3cf380f",
-        "sha256": "1kpsvc53x821cmjg1khvp1nz7906gczq8mp83664cr15h94sh8i4",
+        "rev": "18b7314c13a6d0e82113a15c14e7a5f54286327d",
+        "sha256": "0b2xb99nn7ddysvgzncwa4vglv0j6c0l4bgxz9hl4i3gmrlq3r59",
         "type": "tarball",
-        "url": "https://github.com/nmattia/niv/archive/ba57d5a29b4e0f2085917010380ef3ddc3cf380f.tar.gz",
+        "url": "https://github.com/nmattia/niv/archive/18b7314c13a6d0e82113a15c14e7a5f54286327d.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "nixpkgs": {
@@ -113,10 +113,10 @@
         "homepage": "",
         "owner": "nix-community",
         "repo": "NUR",
-        "rev": "75c37edbc512fa20bc2f7a130b92451251896219",
-        "sha256": "0z3m2mffmk2fbfb8q2ysncnpxyhy163ifczm3n212nbr3vqmvm9m",
+        "rev": "4a11b49670386aeb8ab36c95ba11f5efc467757d",
+        "sha256": "1mvscm45znyzmai87zdx79wb69ffm0sm1mvndxdc01swkhxprycz",
         "type": "tarball",
-        "url": "https://github.com/nix-community/NUR/archive/75c37edbc512fa20bc2f7a130b92451251896219.tar.gz",
+        "url": "https://github.com/nix-community/NUR/archive/4a11b49670386aeb8ab36c95ba11f5efc467757d.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "unstable": {
@@ -125,10 +125,10 @@
         "homepage": "",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "1aa915c09dfe5d70570a59646df37ea718e93148",
-        "sha256": "02midnk3c9pdv6bcfq0nz3da22qmxy233ba7fwxd9k2q13fyi9h1",
+        "rev": "f18ba0425d8e8cdf9e1d3168e18f1000b2b8e6e6",
+        "sha256": "053ia41qg6f9bcxmgs36db0lb1y4yhnz08qar6zs5rsisaga7zw3",
         "type": "tarball",
-        "url": "https://github.com/NixOS/nixpkgs/archive/1aa915c09dfe5d70570a59646df37ea718e93148.tar.gz",
+        "url": "https://github.com/NixOS/nixpkgs/archive/f18ba0425d8e8cdf9e1d3168e18f1000b2b8e6e6.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     }
 }

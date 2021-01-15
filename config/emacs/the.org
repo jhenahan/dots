@@ -66,14 +66,14 @@ No startup screen, no bars or icons, and some tweaks to make
 ** THE Utilities
 *** Config Groups
 #+begin_src emacs-lisp
-  (defgroup the-hooks nil
-    "Startup hooks for THE."
-    :group 'the)
-
   (defgroup the nil
     "Customize your THE experience."
     :prefix "the-"
     :group 'emacs)
+
+  (defgroup the-hooks nil
+    "Startup hooks for THE."
+    :group 'the)
 #+end_src
 *** Hooks
 #+begin_src emacs-lisp
@@ -200,7 +200,7 @@ Default [[https://www.gnutls.org/][GnuTLS]] settings in Emacs are /bad/.
 #+end_src
 *** Keybindings
 We use [[https://github.com/emacs-evil/evil][evil]] for a baseline, [[https://github.com/noctuid/general.el][general]] for customizations, and
-[[https://github.com/justbur/emacs-which-key][which-key]] for discovery.
+[[https://github.com/justbur/emacs-which-key][which-key]] for discovery. The 
 #+begin_src emacs-lisp
   (use-package which-key
     :demand t
@@ -215,6 +215,7 @@ We use [[https://github.com/emacs-evil/evil][evil]] for a baseline, [[https://gi
     :commands evil-mode
     :init
     (setq evil-want-keybinding nil)
+    (setq evil-undo-system 'undo-tree)
     :config
     (evil-mode 1))
 
@@ -249,23 +250,47 @@ We use [[https://github.com/raxod502/selectrum][selectrum]] and [[https://github
 (anything that uses ~completing-read~) and intelligent sorting of
 those candidates.
 #+begin_src emacs-lisp
+  (use-package orderless
+    :commands (orderless-filter orderless-highlight-matches))
+
   (use-package selectrum
     :commands selectrum-mode
     :init
+    (setq selectrum-refine-candidates-function #'orderless-filter
+          selectrum-highlight-candidates-function #'orderless-highlight-matches)
     (selectrum-mode +1))
 
   (use-package selectrum-prescient
-    :demand t
-    :after selectrum
     :commands prescient-persist-mode selectrum-prescient-mode
-    :config
+    :init
     (setq prescient-history-length 1000)
     (prescient-persist-mode +1)
     (selectrum-prescient-mode +1))
+
+  (use-package consult
+    :bind (("C-x b" . consult-buffer)))
+
+  (use-package consult-selectrum
+    :demand t)
+
+  (use-package marginalia
+    :init
+    (marginalia-mode)
+    (setq marginalia-annotators '(marginalia-annotators-heavy marginalia-annotators-light nil)))
+
+  (use-package embark
+    :bind ("C-S-a" . embark-act))
+
+  (use-package embark-consult
+    :after (embark consult)
+    :demand t
+    :hook
+    (embark-collect-mode . embark-consult-preview-minor-mode))
 #+end_src
 ** Git
 #+begin_src emacs-lisp
-  (use-package magit)
+  (use-package magit
+    :demand t)
 #+end_src
 ** Buffers
 *** Autorevert
@@ -343,6 +368,14 @@ Making LSP (and other tools) work sanely is much easier with
     (global-company-mode +1)
     (company-tng-mode +1)
     :blackout "Comp")
+
+  (use-package company-box
+    :hook (company-mode . company-box-mode)
+    :init
+    (setq company-box-icons-alist 'company-box-icons-all-the-icons))
+
+  (use-package mixed-pitch
+    :hook (text-mode . mixed-pitch-mode))
 
   (use-package company-prescient
     :demand t
@@ -587,6 +620,7 @@ Making LSP (and other tools) work sanely is much easier with
 
 ** Closing
 #+begin_src emacs-lisp
+  (server-start)
   (provide 'the)
   ;;; the.el ends here
 #+end_src

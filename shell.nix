@@ -35,8 +35,9 @@ let
     >&2 echo "Setting up nix-darwin..."
     if (! command -v darwin-rebuild); then
         echo >&2 "Installing nix-darwin..."
+        export NIX_PATH=darwin=$DARWIN:nixpkgs=$NIXPKGS:darwin-config=$DARWIN_CONFIG:nixpkgs-overlays=$OVERLAYS:home-manager=$HOME_MANAGER:$NIX_PATH
         echo $(nix-build '<darwin>' -A system --no-out-link)/sw/bin/darwin-rebuild switch
-        $(nix-build '<darwin>' -A system --no-out-link)/sw/bin/darwin-rebuild switch \
+        $(nix-build '<darwin>' -A system --no-out-link)/sw/bin/darwin-rebuild switch --keep-going \
           -I "darwin=$DARWIN" \
           -I "darwin-config=$DARWIN_CONFIG" \
           -I "nixpkgs=$NIXPKGS" \
@@ -44,7 +45,7 @@ let
           -I "home-manager=$HOME_MANAGER"
     fi
     echo >&2 "Switching to new configuration..."
-    darwin-rebuild switch --show-trace \
+    darwin-rebuild switch --keep-going --show-trace \
           -I "darwin=$DARWIN" \
           -I "darwin-config=$DARWIN_CONFIG" \
           -I "nixpkgs=$NIXPKGS" \
