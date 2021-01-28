@@ -5,10 +5,10 @@
         "homepage": "",
         "owner": "zenixls2",
         "repo": "alacritty",
-        "rev": "fdc10d270e423e6bec756cab61b502e28260129e",
-        "sha256": "1nn169x3fq0fy1ah003y6fivc3lm84230mmippppfg7v9md1n56m",
+        "rev": "a1e2d6a5573d967aaceeadaefa17b6a00a2e4ca4",
+        "sha256": "0iwvaxr0c9ckz117ykhbnmaxcaxmk95vjpdc5ga806h4rnc1xfbz",
         "type": "tarball",
-        "url": "https://github.com/zenixls2/alacritty/archive/fdc10d270e423e6bec756cab61b502e28260129e.tar.gz",
+        "url": "https://github.com/zenixls2/alacritty/archive/a1e2d6a5573d967aaceeadaefa17b6a00a2e4ca4.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "darwin": {
@@ -35,16 +35,40 @@
         "url": "https://github.com/justinwoo/easy-dhall-nix/archive/eae7f64c4d6c70681e5a56c84198236930ba425e.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
+    "emacs-ligature": {
+        "branch": "master",
+        "description": "Display typographical ligatures in Emacs",
+        "homepage": null,
+        "owner": "mickeynp",
+        "repo": "ligature.el",
+        "rev": "c830b9d74dcf4ff08e6f19cc631d924ce47e2600",
+        "sha256": "1a48h3fj0vs7abashwz3shld724abin7a41vilf5mjzapry9fmkh",
+        "type": "tarball",
+        "url": "https://github.com/mickeynp/ligature.el/archive/c830b9d74dcf4ff08e6f19cc631d924ce47e2600.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    },
     "emacs-overlay": {
         "branch": "revert-package-el-changes",
         "description": "Bleeding edge emacs overlay [maintainer=@adisbladis] ",
         "homepage": "",
         "owner": "jhenahan",
         "repo": "emacs-overlay",
-        "rev": "40d95bd24ab1921a367cb56a1b8df39b88a1f2b2",
-        "sha256": "1ypxlxcp633nnvp16rzmwky1d93dn5drv3gcjribb0ksx0nhq4df",
+        "rev": "7507ddd26f5f65d8894d9252b7bd83245e51eb32",
+        "sha256": "0zjmc17fpck1g5adslfswdidw4pjg4gxakr12diahwch0im55qi8",
         "type": "tarball",
-        "url": "https://github.com/jhenahan/emacs-overlay/archive/40d95bd24ab1921a367cb56a1b8df39b88a1f2b2.tar.gz",
+        "url": "https://github.com/jhenahan/emacs-overlay/archive/7507ddd26f5f65d8894d9252b7bd83245e51eb32.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    },
+    "epithet": {
+        "branch": "master",
+        "description": "Emacs package to rename buffers with descriptive names",
+        "homepage": null,
+        "owner": "oantolin",
+        "repo": "epithet",
+        "rev": "d4b500d0ab61eaa4678b41e17b1b1dedb9dcd2de",
+        "sha256": "1ih3jmcs1zw2az1yxsbrr1y8gfidd5cdbc368ylmf4jfn96rjzm5",
+        "type": "tarball",
+        "url": "https://github.com/oantolin/epithet/archive/d4b500d0ab61eaa4678b41e17b1b1dedb9dcd2de.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "haskell.nix": {
@@ -53,10 +77,10 @@
         "homepage": "https://input-output-hk.github.io/haskell.nix",
         "owner": "input-output-hk",
         "repo": "haskell.nix",
-        "rev": "eb0b336c721b32a03502ce12526fe4d7d17559b2",
-        "sha256": "1zhm3y8rrp42g4vf6xmcakw6b05w9wqgdmm9f1bgp2hw42lfqii4",
+        "rev": "a404de5f3cc7306169c7b9c579ee7a906280036c",
+        "sha256": "192h19jc7c4la8rq3sqcnb74lf7iq4mfm4k48qm8mhhabsibm98c",
         "type": "tarball",
-        "url": "https://github.com/input-output-hk/haskell.nix/archive/eb0b336c721b32a03502ce12526fe4d7d17559b2.tar.gz",
+        "url": "https://github.com/input-output-hk/haskell.nix/archive/a404de5f3cc7306169c7b9c579ee7a906280036c.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "home-manager": {
@@ -65,10 +89,22 @@
         "homepage": "https://nix-community.github.io/home-manager/",
         "owner": "nix-community",
         "repo": "home-manager",
-        "rev": "22f6736e628958f05222ddaadd7df7818fe8f59d",
-        "sha256": "1j4hyjd3kgvwym5jjazzyn554ngrm05ca9wl1a7z1bid22asr99p",
+        "rev": "91bd34620d73340be03642279ee0d1c64110ee6c",
+        "sha256": "1pwn2w21rmnk7nqzx9wmgb4k4kph7vfd1r9wcq9xdn7w27cjdg7v",
         "type": "tarball",
-        "url": "https://github.com/nix-community/home-manager/archive/22f6736e628958f05222ddaadd7df7818fe8f59d.tar.gz",
+        "url": "https://github.com/nix-community/home-manager/archive/91bd34620d73340be03642279ee0d1c64110ee6c.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    },
+    "matrix-client": {
+        "branch": "master",
+        "description": "A Matrix client for Emacs!",
+        "homepage": "",
+        "owner": "alphapapa",
+        "repo": "matrix-client.el",
+        "rev": "d2ac55293c96d4c95971ed8e2a3f6f354565c5ed",
+        "sha256": "1scfv1502yg7x4bsl253cpr6plml1j4d437vci2ggs764sh3rcqq",
+        "type": "tarball",
+        "url": "https://github.com/alphapapa/matrix-client.el/archive/d2ac55293c96d4c95971ed8e2a3f6f354565c5ed.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "neuron": {
@@ -77,10 +113,10 @@
         "homepage": "https://neuron.zettel.page",
         "owner": "srid",
         "repo": "neuron",
-        "rev": "5c67c037099f08ca810d970618d388a816362de2",
-        "sha256": "1agamd75zd40ybb0lzsjnzlcb4xc5myh6331sjd5pwlksff1k773",
+        "rev": "cbd1d0dab30b63e49bdcdbbe8ec98970e0150b99",
+        "sha256": "1yhsq50ipyafyg9jm403d7jmi4hmh8z84dqv0fscp14fpcghjdpr",
         "type": "tarball",
-        "url": "https://github.com/srid/neuron/archive/5c67c037099f08ca810d970618d388a816362de2.tar.gz",
+        "url": "https://github.com/srid/neuron/archive/cbd1d0dab30b63e49bdcdbbe8ec98970e0150b99.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "niv": {
@@ -89,10 +125,10 @@
         "homepage": "https://github.com/nmattia/niv",
         "owner": "nmattia",
         "repo": "niv",
-        "rev": "18b7314c13a6d0e82113a15c14e7a5f54286327d",
-        "sha256": "0b2xb99nn7ddysvgzncwa4vglv0j6c0l4bgxz9hl4i3gmrlq3r59",
+        "rev": "3cd7914b2c4cff48927e11c216dadfab7d903fe5",
+        "sha256": "1agq4nvbhrylf2s77kb4xhh9k7xcwdwggq764k4jgsbs70py8cw3",
         "type": "tarball",
-        "url": "https://github.com/nmattia/niv/archive/18b7314c13a6d0e82113a15c14e7a5f54286327d.tar.gz",
+        "url": "https://github.com/nmattia/niv/archive/3cd7914b2c4cff48927e11c216dadfab7d903fe5.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "nixpkgs": {
@@ -113,10 +149,10 @@
         "homepage": "",
         "owner": "nix-community",
         "repo": "NUR",
-        "rev": "4a11b49670386aeb8ab36c95ba11f5efc467757d",
-        "sha256": "1mvscm45znyzmai87zdx79wb69ffm0sm1mvndxdc01swkhxprycz",
+        "rev": "33fcb6d667f86e48ad2a7547fefa7bdd4b3099c2",
+        "sha256": "1z25k49jacsrbh8w1r7lq6lfsl1wdmgiiyp34jrxw8494gb7vzqy",
         "type": "tarball",
-        "url": "https://github.com/nix-community/NUR/archive/4a11b49670386aeb8ab36c95ba11f5efc467757d.tar.gz",
+        "url": "https://github.com/nix-community/NUR/archive/33fcb6d667f86e48ad2a7547fefa7bdd4b3099c2.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "unstable": {
@@ -125,10 +161,10 @@
         "homepage": "",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "f18ba0425d8e8cdf9e1d3168e18f1000b2b8e6e6",
-        "sha256": "053ia41qg6f9bcxmgs36db0lb1y4yhnz08qar6zs5rsisaga7zw3",
+        "rev": "2fcf614ea383bc4f0737b8f7304a10596935b23e",
+        "sha256": "0pvlwg3an041y5inlvzd9fn8g5521dc9npc03k65alf5y3v5kzgp",
         "type": "tarball",
-        "url": "https://github.com/NixOS/nixpkgs/archive/f18ba0425d8e8cdf9e1d3168e18f1000b2b8e6e6.tar.gz",
+        "url": "https://github.com/NixOS/nixpkgs/archive/2fcf614ea383bc4f0737b8f7304a10596935b23e.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     }
 }

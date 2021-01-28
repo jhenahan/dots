@@ -31,7 +31,6 @@
       autosetupmerge = "always";
       autosetuprebase = "always";
     };
-    github.user = "jhenahan";
     pull.rebase = true;
     rebase.autosquash = true;
     rerere.enabled = true;

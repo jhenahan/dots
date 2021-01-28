@@ -1,41 +1,137 @@
 #+PROPERTY: header-args :tangle yes
 * The Heretic's Emacs
+#+begin_quote
+A worker may be the hammer’s master, but the hammer still prevails. A
+tool knows exactly how it is meant to be handled, while the user of
+the tool can only have an approximate idea. --- Milan Kundera
+#+end_quote
+
+I contend that to improve your tools is to improve the quality of your
+work. The iterative process of perfection is a series of
+approximations with the intent to maximize productivity while
+minimizing labor. Some will insist that it is a greater good to learn
+only to swing the hammer perfecly rather than to remake the hammer to
+perfect it for your swing. What if you must use another's hammer?
+
+In truth, I don't think such people are dreaming big enough. Why
+should you use another's hammer simply because it's there? Why not
+bring your own?
+
+Here, I attempt to bring my own hammer with me wherever I go, and that
+hammer is Emacs.
+** Abstract
+This document is a [[https://www-cs-faculty.stanford.edu/~knuth/lp.html][literate program]] written with [[http://orgmode.org/][Org-mode]] and [[https://www.gnu.org/software/emacs/manual/html_node/elisp/][Emacs
+Lisp]] ([[info:elisp][Info manual link]]). This literate program allows me to include
+both actual source code and explanatory prose, both for the benefit of
+the reader and for the benefit of me in six months when I forget why
+on earth I've changed some setting.
+
+This configuration is designed to work on Emacs versions 27 and
+greater, though my current build is [[https://www.emacswiki.org/emacs/GccEmacs][GCC Emacs]], which compiles ELisp to
+native code. The personal ease of maintaining this build would not be
+possible without the hard work of the contributors to the [[https://github.com/nix-community/emacs-overlay][Emacs
+Overlay]].
+** For The Reader
+This program is organized (for certain generous definitions of the
+word) in a way that makes some sort of sense to me in order to assist
+with navigation and maintenance. You are encouraged to explore the
+components in any order, with the idea in mind that "higher-level"
+functionality is likely to be nearer the bottom as it depends on
+functionality earlier in the file, though due to fancy package
+management tricks this is not always the case.
+
+On encountering an unfamiliar symbol, ~C-h o~ with the point on the
+symbol of interest will provide documentation for that symbol.
 ** Throat Clearing
 *** Header
+The source code of this configuration is licensed under the [[https://www.gnu.org/licenses/agpl-3.0.en.html][GNU Affero
+General Public License, Version 3]]. The textual portion of this
+literate program is presently not explicitly licensed (and therefore
+defaults to all rights reserved), but this will likely change when I
+figure out what the right way to license the prose of literate
+programs is. Please reach out to me [[mailto:speaker@deadbriga.de][at this address]] if you wish to
+reuse any or all of this prose in the meanwhile.
 #+begin_src emacs-lisp
-  ;;; the.el --- All the actual config
+  ;;; the.el --- The Heretic's Emacs
   ;; -*- lexical-binding: t -*-
 
-  ;;; Commentary:
-  ;; To see the outline of this file, run M-x outline-minor-mode and
-  ;; then press C-c @ C-t. To also show the top-level functions and
-  ;; variable declarations in each section, run M-x occur with the
-  ;; following query: ^;;;;* \|^(
+  ;; This file is NOT part of GNU Emacs.
 
-  ;;; Detect stale bytecode
-
-  ;; If Emacs version changed, the bytecode is no longer valid and we
-  ;; must recompile. Also, if the location of THE changed, our
-  ;; dotfile-finding functions are defined incorrectly and we must
-  ;; recompile.
+  ;;  Copyright 2021 Speaker
+  ;; 
+  ;;  This program is free software: you can redistribute it and/or modify
+  ;;  it under the terms of the GNU Affero General Public License as published by
+  ;;  the Free Software Foundation, either version 3 of the License, or
+  ;;  (at your option) any later version.
+  ;; 
+  ;;  This program is distributed in the hope that it will be useful,
+  ;;  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ;;  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ;;  GNU Affero General Public License for more details.
+  ;; 
+  ;;  You should have received a copy of the GNU Affero General Public License
+  ;;  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
   ;;; Code:
 #+end_src
+** Package Management
+The work of package installation for this configuration is managed by
+the [[../../overlays/emacs.nix][Nix overlay]] in this repo, but [[https://github.com/jwiegley/use-package][use-package]] provides the macro
+through which nearly all package configuration occurs. Features of
+this macro will be explained as they are used.
 *** ~use-package~
+This configuration is [[https://www.gnu.org/software/emacs/manual/html_node/eintr/Byte-Compiling.html][byte compiled]] to improve performance. In order
+to keep the byte compiler happy, ~eval-when-compile~ ensures that the
+~use-package~ macro is in scope during compilation.
+~use-package-always-defer~ defaults all configured packages to be
+loaded lazily (i.e., on first use).
 #+begin_src emacs-lisp
   (eval-when-compile
     (require 'use-package))
   (setq use-package-always-defer t)
+  (setq use-package-verbose t)
 #+end_src
+** Level-setting
+Certain aspects of a vanilla Emacs installation are either /odd/,
+/outdated/, or just not to my taste.
 *** Convenience libraries
+The built-in list, file, and string APIs in recent versions of Emacs
+have improved quite a lot from when I first started using Emacs, but
+I've gotten used to using these libraries which are a bit less verbose
+and a bit more obvious to use.
+- [[https://github.com/magnars/dash.el][dash.el]] is an alternative list API (and, this being a Lisp, lists
+  come up a lot)
+- [[https://github.com/rejeep/f.el][f.el]] is an alternative file API
+- [[https://github.com/magnars/s.el][s.el]] is an alternative string API
+
+The ~:demand~ key in ~use-package~ dictates that the package be loaded
+eagerly (that is, immediately), such that its definitions are in scope
+immediately after load.
 #+begin_src emacs-lisp
   (use-package dash :demand t)
-  (use-package f :demand t)
+  (use-package f :commands f-base :demand t)
   (use-package s :demand t)
 #+end_src
 *** UI Cleanup
-No startup screen, no bars or icons, and some tweaks to make
-[[https://github.com/koekeishiya/yabai][yabai]] happy.
+For the reader, I recommend ~M-x about-emacs~, but for the regular
+user it seems more likely that a scratch buffer is a better startup
+screen, so we skip opening the startup splash screen.
+
+My Emacs configuration is intentionally almost entirely
+keyboard-driven, so I have little need for toolbars, scrollbars, or
+really any sort of bar, so we shut all of those off.
+
+My preferred fixed-width font is [[https://fsd.it/shop/fonts/pragmatapro/][Pragmata Pro]], so we set that as our
+default font in all frames (frame being the word Emacs uses for what
+you might otherwise know as an application window).
+
+On macOS, transparent title bars are kind of neat to avoid a bright
+grey title bar in an otherwise very dark UI.
+
+Finally, we disable frame resizing on things like font size changes
+and allow pixelwise frame resizing in order to keep my window manager
+happy.
+
 #+begin_src emacs-lisp
   (setq inhibit-startup-screen t)
   (if (fboundp 'tool-bar-mode)   (tool-bar-mode   -1))
@@ -43,8 +139,6 @@ No startup screen, no bars or icons, and some tweaks to make
   (if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
 
   (setq default-frame-alist '((font . "PragmataPro Liga-14")
-                              ;;(fullscreen . fullboth)
-                              ;;(undecorated . t)
                               (horizontal-scroll-bars)
                               (vertical-scroll-bars)))
 
@@ -56,32 +150,79 @@ No startup screen, no bars or icons, and some tweaks to make
 #+end_src
 
 *** Pretty Ligatures
+Pragmata Pro exposes a large number of ligatures which (to my eye)
+make code more beautiful to read. As Emacs does not presently support
+ligatures directly, we use the quite nice [[https://github.com/mickeynp/ligature.el][ligature.el]] package.
 #+begin_src emacs-lisp
-  (load (concat user-emacs-directory "pragmata"))
-  (global-prettify-symbols-mode)
-  (add-hook 'text-mode-hook 'prettify-hook)
-  (add-hook 'prog-mode-hook 'prettify-hook)
+  (use-package ligature
+    :commands global-ligature-mode ligature-set-ligatures
+    :init
+    (ligature-set-ligatures t '("[ERROR]" "[DEBUG]" "[INFO]" "[WARN]" "[WARNING]"
+                                "[ERR]" "[FATAL]" "[TRACE]" "[FIXME]" "[TODO]"
+                                "[BUG]" "[NOTE]" "[HACK]" "[MARK]"
+                                "# ERROR" "# DEBUG" "# INFO" "# WARN" "# WARNING"
+                                "# ERR" "# FATAL" "# TRACE" "# FIXME" "# TODO"
+                                "# BUG" "# NOTE" "# HACK" "# MARK"
+                                "!!" "!=" "!==" "!!!" "!≡" "!≡≡" "!>" "!=<" "#("
+                                "#_" "#{" "#?" "#>" "##" "#_(" "%=" "%>" "%>%" "%<%"
+                                "&%" "&&" "&*" "&+" "&-" "&/" "&=" "&&&" "&>" "$>"
+                                "***" "*=" "*/" "*>" "++" "+++" "+=" "+>" "++=" "--"
+                                "-<" "-<<" "-=" "->" "->>" "---" "-->" "-+-" "-\\/"
+                                "-|>" "-<|" ".." "..." "..<" ".>" ".~" ".=" "/*" "//"
+                                "/>" "/=" "/==" "///" "/**" ":::" "::" ":=" ":≡" ":>"
+                                ":=>" ":(" ":-(" ":)" ":-)" ":/" ":\\" ":3" ":D" ":P"
+                                ":>:" ":<:" "<$>" "<*" "<*>" "<+>" "<-" "<<" "<<<" "<<="
+                                "<=" "<=>" "<>" "<|>" "<<-" "<|" "<=<" "<~" "<~~" "<<~"
+                                "<$" "<+" "<!>" "<@>" "<#>" "<%>" "<^>" "<&>" "<?>" "<.>"
+                                "</>" "<\\>" "<\">" "<:>" "<~>" "<**>" "<<^" "<!" "<@"
+                                "<#" "<%" "<^" "<&" "<?" "<." "</" "<\\" "<\"" "<:" "<->"
+                                "<!--" "<--" "<~<" "<==>" "<|-" "<<|" "<-<" "<-->" "<<=="
+                                "<==" "=<<" "==" "===" "==>" "=>" "=~" "=>>" "=/=" "=~="
+                                "==>>" "≡≡" "≡≡≡" "≡:≡" ">-" ">=" ">>" ">>-" ">>=" ">>>"
+                                ">=>" ">>^" ">>|" ">!=" ">->" "??" "?~" "?=" "?>" "???"
+                                "?." "^=" "^." "^?" "^.." "^<<" "^>>" "^>" "\\\\" "\\>"
+                                "\\/-" "@>" "|=" "||" "|>" "|||" "|+|" "|->" "|-->" "|=>"
+                                "|==>" "|>-" "|<<" "||>" "|>>" "|-" "||-" "~=" "~>" "~~>"
+                                "~>>" "[[" "]]" "\">" "_|_"))
+    (global-ligature-mode t))
 #+end_src
 
 ** THE Utilities
+My hope is to treat my configuration like any other library. That is,
+I wish to customize it in the standard Emacs way, and surface
+documentation in the running system without having to refer to this
+file for every little thing.
 *** Config Groups
+I define some basic configuration groups here, to manage hooks and
+top-level custom variables. The ~:prefix~ key on ~defgroup~ ensures
+that when rendered in the Customization window the prefix "The" will
+be stripped from subgroups. This is not immediately clear from the
+docs for ~defgroup~ which simply say that the valid keys are the same
+as for ~defcustom~, but the [[info:elisp#Group Definitions][Info page]] mentions it.
 #+begin_src emacs-lisp
+  (defgroup the-hooks nil
+    "Startup hooks for THE."
+    :group 'the)
+
   (defgroup the nil
     "Customize your THE experience."
     :prefix "the-"
     :group 'emacs)
-
-  (defgroup the-hooks nil
-    "Startup hooks for THE."
-    :group 'the)
 #+end_src
 *** Hooks
+Most hooks are straightforward enough to be defined inline with the
+~use-package~ declaration, but occasionally a more complex hook is
+called for. Normally this is handled with a lambda, but in the
+interest of self-documenting, ~the-defhook~ creates named functions
+and adds them to the requested hooks.
+
+We also define our own hook to hang late initialization off of.
 #+begin_src emacs-lisp
   (defmacro the-defhook (name arglist hooks docstring &rest body)
-    "Define a function called NAME and add it to a hook.
-    ARGLIST is as in `defun'. HOOKS is a list of hooks to which to
-    add the function, or just a single hook. DOCSTRING and BODY are
-    as in `defun'."
+    "Define a function called NAME and add it to a hook. ARGLIST is
+  as in `defun'. HOOKS is a list of hooks to which to add the
+  function, or just a single hook. DOCSTRING and BODY are as in
+  `defun'."
     (declare (indent 2)
              (doc-string 4))
     (unless (listp hooks)
@@ -102,23 +243,16 @@ No startup screen, no bars or icons, and some tweaks to make
          (dolist (hook ',hooks)
            (add-hook hook ',name)))))
 
-  (setq the--finalize-init-hook nil)
-
   (defcustom the-after-init-hook nil
-    "Hook run after at the very end of init.
-    For use with `the-local-on-hook' in init.local.el."
+    "Hook run after at the very end of init. Mainly for late
+  initialization of packages and so on."
     :group 'the-hooks
     :type 'hook)
-
-  (defvar the--hook-contents nil
-    "Alist mapping local init hooks to lists of forms.
-    This is used to embed local init hook code directly into the
-    init-file at the appropriate places during byte-compilation,
-    without breaking macro-expansion.")
-
-  (setq the--hook-contents nil)
 #+end_src
 *** Operating System Detection
+Here and there are settings which only make sense in the context of a
+particular operating system. We define ~the-with-operating-system~ to
+make these circumstances explicit.
 #+begin_src emacs-lisp
   (defmacro the-operating-system-p (os)
     "Return non-nil if OS corresponds to the current operating system.
@@ -141,49 +275,59 @@ No startup screen, no bars or icons, and some tweaks to make
        ,@body))
 #+end_src
 ** Basics
-*** Modeline Cleanup
-[[https://github.com/raxod502/blackout][blackout]] is the best modeline hygiene tool I've seen so far.
+*** COMMENT Modeline Cleanup
+[[https://github.com/raxod502/blackout][blackout]] is the best modeline hygiene tool I've seen so far. I'm using
+~doom-modeline~ at the moment, though, so it's not actually necessary.
 #+begin_src emacs-lisp
   (use-package blackout
     :demand t)
 #+end_src
 *** Metadata Cleanup
-Emacs and packages love to throw files all over the
-place. [[https://github.com/emacscollective/no-littering][no-littering]] is a great tool for wrangling all the
-junk. We also take their recommended settings for ~recentf~,
-auto-saves, and customizations. We also disable backup files and
-lockfiles because they're just noise.
+Emacs and packages love to throw files all over the place.
+[[https://github.com/emacscollective/no-littering][no-littering]] is a great tool for wrangling all the junk. We also take
+their recommended settings for ~recentf~, auto-saves, and
+customizations. We also disable backup files and lockfiles because
+they're just noise.
+
+The ~:config~ key to ~use-package~ indicates code which should be
+executed /after/ the package loads. Since we use ~:demand~, this is
+"right now".
 #+begin_src emacs-lisp
   (use-package no-littering
     :demand t
-    :config
-    (require 'recentf)
-    (add-to-list 'recentf-exclude no-littering-var-directory)
-    (add-to-list 'recentf-exclude no-littering-etc-directory)
-
-    (setq auto-save-file-name-transforms
+    :custom
+    (auto-save-file-name-transforms
           `((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))
-    (setq custom-file (no-littering-expand-etc-file-name "custom.el")))
+    (custom-file (no-littering-expand-etc-file-name "custom.el"))
+    :config
+    (use-package recentf :defines recentf-exclude)
+    (add-to-list 'recentf-exclude no-littering-var-directory)
+    (add-to-list 'recentf-exclude no-littering-etc-directory))
 
   (setq make-backup-files nil)
 
   (setq create-lockfiles nil)
+  (load custom-file)
 #+end_src
 *** Correct Org
-Emacs has an annoying habit of loading whatever the built-in
-version of [[https://orgmode.org/][org-mode]] is, so we register our version of Org early
-so anything which depends on Org won't get weird.
+Emacs has an annoying habit of loading whatever the built-in version
+of [[https://orgmode.org/][org-mode]] is, so we register our version of Org early so anything
+which depends on Org won't get weird.
+
+The ~:ensure~ keyword allows us to specify that the library ~org~
+should be loaded from the package ~org-plus-contrib~.
 #+begin_src emacs-lisp
   (use-package org
     :ensure org-plus-contrib)
 #+end_src
 *** Theme
 [[https://github.com/morhetz/gruvbox][Gruvbox]] is the best theme, I will not be taking questions. The
-[[https://github.com/hlissner/emacs-doom-themes][doom-themes]] package has one of the nicer implementations, and
-also does some extra work to improve Org's use of the theme.
+[[https://github.com/hlissner/emacs-doom-themes][doom-themes]] package has one of the nicer implementations, and also
+does some extra work to improve Org's use of the theme.
 #+begin_src emacs-lisp
   (use-package doom-themes
     :demand t
+    :commands doom-themes-org-config
     :config
     (load-theme 'doom-gruvbox t)
     (require 'doom-themes-ext-org)
@@ -191,6 +335,9 @@ also does some extra work to improve Org's use of the theme.
 #+end_src
 *** TLS
 Default [[https://www.gnutls.org/][GnuTLS]] settings in Emacs are /bad/.
+
+The ~:init~ keyword indicates code that should be run /before/ the
+package loads. 
 #+begin_src emacs-lisp
   (use-package gnutls
     :ensure nil
@@ -199,40 +346,54 @@ Default [[https://www.gnutls.org/][GnuTLS]] settings in Emacs are /bad/.
           gnutls-min-prime-bits 3072))
 #+end_src
 *** Keybindings
-We use [[https://github.com/emacs-evil/evil][evil]] for a baseline, [[https://github.com/noctuid/general.el][general]] for customizations, and
-[[https://github.com/justbur/emacs-which-key][which-key]] for discovery. The 
+I use [[https://github.com/emacs-evil/evil][evil]] for a baseline, [[https://github.com/noctuid/general.el][general]] for customizations, and
+[[https://github.com/justbur/emacs-which-key][which-key]] for discovery. Modal editing is, to my mind, a strictly
+better way of thinking about the actual process of editing text. The
+[[https://github.com/emacs-evil/evil-collection][Evil Collection]] wraps up a bunch of work to integrate common modes
+with Evil (mainly keybindings).
+
+The ~:commands~ keyword registers symbols with the byte compiler so we
+don't get a bunch of spurious warnings about undefined symbols.
+
+~:custom~ settings are essentially just ~setq~ invocations with a
+docstring.
+
+~:after~ defers loading of a package until the listed packages have
+loaded.
 #+begin_src emacs-lisp
   (use-package which-key
-    :demand t
     :commands which-key-mode
-    :config
-    (setq which-key-show-early-on-C-h t)
-    (which-key-mode 1)
-    :blackout t)
+    :init
+    (which-key-mode 1))
 
   (use-package evil
-    :demand t
     :commands evil-mode
+    :custom
+    (evil-want-integration t "Required for evil-collection")
+    (evil-want-keybinding nil "Required for evil-collection")
+    (evil-undo-system 'undo-tree "Use undo-tree for undo/redo")
     :init
-    (setq evil-want-keybinding nil)
-    (setq evil-undo-system 'undo-tree)
-    :config
     (evil-mode 1))
 
   (use-package evil-collection
-    :demand t
-    :custom (evil-collection-setup-minibuffer t)
+    :after evil
+    :commands evil-collection-init
+    :custom (evil-collection-setup-minibuffer t "Use Evil bindings in the minibuffer")
     :init (evil-collection-init))
 
   (use-package general
-    :demand t)
+    :commands general-define-key general-create-definer)
 #+end_src
-*** Sanity
-There are some weird defaults.
+*** Fixing Emacs
+There are some weird defaults. We don't type on typewriters, anymore,
+so sentences end with a single space. I do not use tabs, period.
+Finally, filling my kill ring (think "clipboard") with duplicate
+entries seems foolish.
 #+begin_src emacs-lisp
   (setq sentence-end-double-space nil)
   (setq-default indent-tabs-mode nil)
   (setq kill-do-not-save-duplicates t)
+  (setq vc-handled-backends nil)
 #+end_src
 **** Utilities
 Little macro to make binding mode-specific keys less of a chore.
@@ -245,19 +406,42 @@ Little macro to make binding mode-specific keys less of a chore.
       :keymaps 'the-keymap
       ,key-name ,command :wk ,which-key ,predicate))
 #+end_src
-** Candidate Selection
-We use [[https://github.com/raxod502/selectrum][selectrum]] and [[https://github.com/raxod502/prescient.el][prescient]] for candidate selection
-(anything that uses ~completing-read~) and intelligent sorting of
-those candidates.
+** Emacs Features
+*** Candidate Selection
+[[https://github.com/raxod502/selectrum][Selectrum]] is built on top of the native ~completing-read~ facilities
+in Emacs, providing a richer candidate selection interface without
+digging deeply into Emacs internals or reinventing the wheel.
+
+[[https://github.com/oantolin/orderless][Orderless]] provides a completion style allowing for candidate narrowing
+by parts. For instance ~ord mat~ will match candidates containing both
+of those fragments in any order. These fragments may be regular
+expressions or initialisms, by default, but the package exposes
+additonal options if needed.
+
+[[https://github.com/raxod502/prescient.el][Prescient]] provides "frecency" sorting for candidates, such that
+frequently or recently used candidates are sorted preferentially in
+candidate lists.
+
+[[https://github.com/minad/consult][Consult]] provides helpful functions based on ~completing-read~. These
+will be described in more detail in [[Custom Keymap]].
+
+[[https://github.com/minad/marginalia][Marginalia]] enriches minibuffers with useful information like
+docstrings and file information.
+
+[[https://github.com/oantolin/embark/][Embark]] provides contextual actions in the minibuffer, reminiscent of
+Helm's rich minibuffer action machinery. I never used it much when I
+used Helm ages ago, but it seems interesting so I'm playing around
+with it.
 #+begin_src emacs-lisp
   (use-package orderless
     :commands (orderless-filter orderless-highlight-matches))
 
   (use-package selectrum
     :commands selectrum-mode
+    :custom
+    (selectrum-refine-candidate-function #'orderless-filter "Use orderless filtering.")
+    (selectrum-highlight-candidates-function #'orderless-highlight-matches "Use orderless highlighting.")
     :init
-    (setq selectrum-refine-candidates-function #'orderless-filter
-          selectrum-highlight-candidates-function #'orderless-highlight-matches)
     (selectrum-mode +1))
 
   (use-package selectrum-prescient
@@ -268,68 +452,143 @@ those candidates.
     (selectrum-prescient-mode +1))
 
   (use-package consult
-    :bind (("C-x b" . consult-buffer)))
-
-  (use-package consult-selectrum
-    :demand t)
+    :commands consult-buffer consult-buffer-other-window consult-ripgrep
+    :config
+    (require 'consult-selectrum))
 
   (use-package marginalia
+    :commands marginalia-mode
+    :custom
+    (marginalia-annotators '(marginalia-annotators-heavy marginalia-annotators-light nil))
     :init
-    (marginalia-mode)
-    (setq marginalia-annotators '(marginalia-annotators-heavy marginalia-annotators-light nil)))
+    (marginalia-mode))
 
   (use-package embark
     :bind ("C-S-a" . embark-act))
 
   (use-package embark-consult
     :after (embark consult)
-    :demand t
     :hook
     (embark-collect-mode . embark-consult-preview-minor-mode))
 #+end_src
-** Git
+*** Help
+Emacs has rich built-in help and Info docs, but [[https://github.com/Wilfred/helpful][helpful]] provides some
+additional niceties like source code in the buffer, references,
+keymaps, etc.
+#+begin_src emacs-lisp
+  (use-package helpful
+    :commands helpful-callable helpful-variable helpful-key helpful-at-point)
+#+end_src
+*** Buffers
+**** Autorevert
+I never want to be bitten by a buffer not reflecting the file on disk.
+#+begin_src emacs-lisp
+  (use-package autorevert
+    :ensure nil
+    :custom (auto-revert-verbose nil)
+    :init
+    (global-auto-revert-mode +1))
+#+end_src
+**** Saveplace
+It's nice to come back to a file and not have to figure out what you
+were doing.
+#+begin_src emacs-lisp
+  (save-place-mode +1)
+#+end_src
+**** Search
+[[https://github.com/raxod502/ctrlf][ctrlf]] is a simple incremental search. I'm experimenting with ~consult~
+to replace this, but it's quite fast so I may keep it around for very
+simple searches.
+#+begin_src emacs-lisp
+  (use-package ctrlf
+    :commands ctrlf-mode
+    :init
+    (ctrlf-mode +1))
+#+end_src
+**** Undo
+I still don't really grok standard Emacs undo, so I use [[http://www.dr-qubit.org/undo-tree.html][undo-tree]].
+#+begin_src emacs-lisp
+  (use-package undo-tree
+    :commands global-undo-tree-mode
+    :custom (undo-tree-enable-undo-in-region nil "Undo in region is buggy")
+    :init
+    (global-undo-tree-mode +1))
+#+end_src
+**** Epithet
+#+begin_src emacs-lisp
+  (use-package epithet
+    :init
+    (defun the-epithet-for-neuron ()
+      "Suggest a name for a `neuron-mode' buffer."
+      (when (derived-mode-p 'neuron-mode)
+        (let* ((zettel-id (f-base (buffer-file-name)))
+               (zettel (neuron--get-cached-zettel-from-id zettel-id))
+               (title (alist-get 'zettelTitle zettel)))
+          title)))
+    :config
+    (add-to-list 'epithet-suggesters 'the-epithet-for-neuron)
+    :hook (neuron-mode . epithet-rename-buffer))
+#+end_src
+*** Completion
+I've used [[https://company-mode.github.io/][Company]] for several years (after it more or less ate
+~auto-complete~'s lunch) and the new TNG mode works similarly to the
+tab completion common in other editors.
+
+[[https://github.com/sebastiencs/company-box][company-box]] is a fancy frontend for Company, and ~company-prescient~
+provides the same frecency sorting for completion candidates as for
+other candidate selections.
+#+begin_src emacs-lisp
+  (use-package company
+    :commands global-company-mode
+    :custom
+    (company-idle-delay 0.1 "Completions NOW")
+    (company-minimum-prefix-length 1 "Give me all of them")
+    (company-tooltip-align-annotations t)
+    (company-require-match 'never)
+    (company-global-modes '(not erc-mode message-mode help-mode gud-mode))
+    (company-dabbrev-other-buffers nil)
+    (company-dabbrev-ignore-case nil)
+    (company-dabbrev-downcase nil)
+    :init
+    (use-package company-tng
+      :ensure company
+      :commands company-tng-mode
+      :init
+      (company-tng-mode +1))
+    (global-company-mode +1))
+
+  (use-package company-box
+    :hook (company-mode . company-box-mode)
+    :custom
+    (company-box-icons-alist 'company-box-icons-all-the-icons))
+
+  (use-package company-prescient
+    :after company
+    :commands company-prescient-mode
+    :init
+    (company-prescient-mode +1))
+#+end_src
+** Tools
+*** Git
+[[https://magit.vc/][Magit]] is the best Git porcelain I've encountered. If you've never used
+Git, it will teach you how to use it well; if you have, it will make
+you /better/.
 #+begin_src emacs-lisp
   (use-package magit
     :demand t)
 #+end_src
-** Buffers
-*** Autorevert
-I never want to be bitten by a buffer not reflecting the file on
-disk.
+*** Direnv
+Making LSP (and other tools) work sanely is much easier with [[https://direnv.net/][direnv]].
 #+begin_src emacs-lisp
-  (setq auto-revert-verbose nil)
-  (global-auto-revert-mode +1)
-#+end_src
-*** Saveplace
-It's nice to come back to a file and not have to figure out what
-you were doing.
-#+begin_src emacs-lisp
-  (save-place-mode +1)
-#+end_src
-*** Search
-[[https://github.com/raxod502/ctrlf][ctrlf]] is a simple incremental search.
-#+begin_src emacs-lisp
-
-  (use-package ctrlf
-    :demand t
-    :config
-    (ctrlf-mode +1))
-#+end_src
-*** Undo
-I still don't really grok standard Emacs undo, so I use
-[[http://www.dr-qubit.org/undo-tree.html][undo-tree]].
-#+begin_src emacs-lisp
-  (use-package undo-tree
-    :demand t
-    :config
-    (global-undo-tree-mode +1)
-    (setq undo-tree-enable-undo-in-region nil)
-    :blackout t)
+  (use-package direnv
+    :commands direnv-mode
+    :init
+    (direnv-mode))
 #+end_src
 ** Writing
 *** Autofill
-Save yourself from reflowing by hand. We also set auto-fill to
-trigger on punctuation rather than only on whitespace.
+Save yourself from reflowing by hand. We also set auto-fill to trigger
+on punctuation rather than only on whitespace.
 #+begin_src emacs-lisp
   (mapc
    (lambda (c)
@@ -337,79 +596,62 @@ trigger on punctuation rather than only on whitespace.
    "!-=+]};:'\",.?")
   (add-hook 'text-mode-hook 'turn-on-auto-fill)
 #+end_src
+*** Literate Programs and Documentation
+Literate programming is all well and good, but the eyes do begin to
+ache when staring at miles and miles of monospace text. [[https://gitlab.com/jabranham/mixed-pitch][mixed-pitch]]
+nicesly obsoletes some gross hacks I used to have to get things like
+variable width text in Org prose while retaining fixed with text in
+~src~ blocks.
+#+begin_src emacs-lisp
+  (use-package mixed-pitch
+    :hook (text-mode . mixed-pitch-mode))
+#+end_src
 ** Reading
 *** Speed Reading
+Occasionally, I find that I need to finish an article with a bit more
+focus and speed than my usual /frantically clicking between several
+documents/ strategy, and the [[https://git.sr.ht/~iank/spray/tree][spray]] implementation of RSVP is pretty
+solid.
 #+begin_src emacs-lisp
   (use-package spray)
 #+end_src
-** Direnv
-Making LSP (and other tools) work sanely is much easier with
-[[https://direnv.net/][direnv]].
-#+begin_src emacs-lisp
-  (use-package direnv
-    :demand t
-    :config
-    (direnv-mode))
-#+end_src
-** Completion
-#+begin_src emacs-lisp
-  (use-package company
-    :demand t
-    :config
-    (setq company-idle-delay 0.1
-          company-minimum-prefix-length 1
-          company-tooltip-align-annotations t
-          company-require-match 'never
-          company-global-modes '(not erc-mode message-mode help-mode gud-mode)
-          company-dabbrev-other-buffers nil
-          company-dabbrev-ignore-case nil
-          company-dabbrev-downcase nil)
-    (require 'company-tng)
-    (global-company-mode +1)
-    (company-tng-mode +1)
-    :blackout "Comp")
-
-  (use-package company-box
-    :hook (company-mode . company-box-mode)
-    :init
-    (setq company-box-icons-alist 'company-box-icons-all-the-icons))
-
-  (use-package mixed-pitch
-    :hook (text-mode . mixed-pitch-mode))
-
-  (use-package company-prescient
-    :demand t
-    :after company
-    :config
-    ;; Use `prescient' for Company menus.
-    (company-prescient-mode +1))
-#+end_src
 ** Checking
 *** Flycheck
+[[https://www.flycheck.org/en/latest/][Flycheck]] is a very flexible syntax checker which supports just about
+everything I've thrown at it. I understand that the built-in Flymake
+checker has improved quite a lot from where it was a few years ago,
+but I'm not sure the support in the ecosystem has caught up with this
+fact. Will need to revisit.
 #+begin_src emacs-lisp
   (use-package flycheck
-    :demand t
-    :config
-    (global-flycheck-mode +1)
-    :blackout t)
+    :commands global-flycheck-mode
+    :init
+    (global-flycheck-mode +1))
 #+end_src
 ** Programming
 *** Language Server Protocol
+[[https://microsoft.github.io/language-server-protocol/][The Language Server Protocol]] is an inter-process communication
+protocol to expose IDE features in a uniform fashion to any editor
+implementing the protocol. [[https://github.com/emacs-lsp/lsp-mode][lsp-mode]] is the Emacs client
+implementation. Yasnippet is just in there so that language servers
+that provide snippets will work correctly.
 #+begin_src emacs-lisp
   (use-package lsp-mode
-    :commands (lsp lsp-deferred)
+    :commands lsp lsp-deferred
     :hook
     (lsp-mode . lsp-enable-which-key-integration)
     (lsp-mode . lsp-lens-mode)
-    :init
-    (setq gc-cons-threshold 100000000)
-    (setq read-process-output-max (* 1024 1024 10))
-    (setq lsp-completion-provider :capf)
-    (setq lsp-enable-snippet t)
-    (setq lsp-enable-indentation t)
-    (setq lsp-semantic-highlighting t)
-    (setq lsp-auto-configure t)
-    :blackout "LSP")
+    :custom
+    (gc-cons-threshold 100000000 "Some LSP blobs are HUGE")
+    (read-process-output-max (* 1024 1024 10) "Some LSP blobs are HUGE")
+    (lsp-completion-provider :capf)
+    (lsp-enable-snippet t)
+    (lsp-enable-indentation t)
+    (lsp-semantic-highlighting t)
+    (lsp-auto-configure t)
+    :config
+    (use-package lsp-modeline :ensure lsp-mode)
+    (use-package lsp-headerline :ensure lsp-mode))
 
   (use-package lsp-ui
     :hook (lsp-mode . lsp-ui-mode))
@@ -417,28 +659,59 @@ Making LSP (and other tools) work sanely is much easier with
   (use-package yasnippet)
 #+end_src
 *** Debug Adapter Protocol
+What LSP is to Intellisense and linting, [[https://microsoft.github.io/debug-adapter-protocol/][the Debug Adapter Protocol]] is to
+debuggers. I haven't actually used this much, but maybe someday.
 #+begin_src emacs-lisp
   (use-package posframe)
 
   (use-package dap-mode
+    :demand t
     :hook
-    (lsp-mode . dap-mode)
-    (lsp-mode . dap-ui-mode))
+    (lsp-mode . dap-mode))
+#+end_src
+*** Highlighting
+#+begin_src emacs-lisp
+  (use-package tree-sitter
+    :commands global-tree-sitter-mode
+    :hook (tree-sitter-after-on . tree-sitter-hl-mode)
+    :init
+    (global-tree-sitter-mode))
+  (use-package tree-sitter-langs)
+#+end_src
+*** Delimiters
+I'm incredibly bad at counting delimiters. [[https://github.com/Fanael/rainbow-delimiters][Rainbow]] to the rescue!
+#+begin_src emacs-lisp
+  (use-package rainbow-delimiters
+    :hook (prog-mode . rainbow-delimiters-mode))
 #+end_src
 *** Languages
+I'm tending toward absolutely everything I do being plain text, so I
+end up writing code and configs in a number of languages.
 **** LaTeX
+Confusingly, [[https://www.gnu.org/software/auctex/][AUCTeX]] the package exposes its core library as ~tex~,
+hence this ~:ensure~ indirection. We also have to specify these
+case-sensitive mode names because there are also modes called
+~tex-mode~ and ~latex-mode~, which are /not/ what we want for LSP.
 #+begin_src emacs-lisp
   (use-package tex
     :hook ((LaTeX-mode TeX-mode) . lsp-deferred)
-    :ensure auctex
-    :demand t)
+    :ensure auctex)
 #+end_src
 **** Nix
+If you got this far, I expect my taste for [[https://nixos.org/manual/nix/stable/][Nix]] is obvious. This is
+also the first example of [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Rx-Notation.html][rx]], the structured regular expression
+notation, in this config. ~rx~ forms evaluate to Emacs regexps, but
+without the absolute maintainability and readability nightmare one
+gets from writing them by hand.
 #+begin_src emacs-lisp
   (use-package nix-mode
-    :mode "\\.nix\\'")
+    :mode (rx ".nix" eos))
 #+end_src
 **** Scala
+[[https://www.scala-lang.org/][Scala]] is a functional/object-oriented hybrid language targeting the
+JVM (and Javascript, and native code, but I dare not tread there). I
+lean much more heavily on the FP features, but it's also what I write
+at work so needs must, etc.
 #+begin_src emacs-lisp
   (use-package scala-mode
     :interpreter
@@ -458,44 +731,82 @@ Making LSP (and other tools) work sanely is much easier with
     (setq sbt:program-options '("-Dsbt.supershell=false")))
 
   (use-package lsp-metals
-    :init
-    (setq lsp-metals-treeview-show-when-views-received t))
+    :custom
+    (lsp-metals-treeview-show-when-views-received t))
+#+end_src
+**** JavaScript/TypeScript/React/etc.
+Well, I guess I have to touch UI code here and there, now.
+#+begin_src emacs-lisp
+  (use-package rjsx-mode
+    :mode ((rx ".js" (optional "x") eos))
+    :hook (rjsx-mode . lsp))
 #+end_src
 **** Haskell
+[[https://www.haskell.org/][Haskell]] is what I would think of as my "native" language. I didn't
+really write enough code in non-Haskell languages before picking it up
+to build too many bad habits up, so it wasn't particularly hard to get
+into. Now it's the language I reach for first when exploring a design
+or working on a personal project. I even have a little Haskell in
+production at work. My Haskell workflow relies on [[https://github.com/target/lorri][lorri]] (and thus
+~direnv~) and the [[https://input-output-hk.github.io/haskell.nix/][haskell.nix]] infrastructure, so we need to use
+~lsp-deferred~ to ensure that ~direnv~ has time to update the
+environment before the server tries to start.
 #+begin_src emacs-lisp
   (use-package haskell-mode
-    :mode (("\\.hs\\'"    . haskell-mode)
-           ("\\.cabal\\'" . haskell-cabal-mode)
-           ("\\.hcr\\'"   . haskell-core-mode))
+    :mode (((rx ".hs" eos)    . haskell-mode)
+           ((rx ".cabal" eos) . haskell-cabal-mode)
+           ((rx ".hcr" eos)   . haskell-core-mode))
     :hook (haskell-mode . lsp-deferred))
 
   (use-package lsp-haskell
-    :init
-    (setq lsp-haskell-server-path "haskell-language-server"))
+    :custom
+    (lsp-haskell-server-path "haskell-language-server"))
 #+end_src
 **** Dhall
+[[https://dhall-lang.org/][Dhall]] is JSON + functions + types + imports. It takes some getting
+used to, but it has become my tool of choice for configuration of
+late.
 #+begin_src emacs-lisp
   (use-package dhall-mode
-    :mode "\\.dhall\\'"
+    :mode (rx ".dhall" eos)
     :hook (dhall-mode . lsp))
 #+end_src
 **** YAML
+[[https://yaml.org/][YAML]] is "human-readable" in the sense that it doesn't actually harm
+your eyes to read it the way JSON does, but I try very hard not to
+write it directly (since Dhall can just spit it out for me). I still
+deal with lots of configuration in this format, though, so it's
+helpful to keep the mode around.
 #+begin_src emacs-lisp
   (use-package yaml-mode
-    :mode (("\\.yml\\'" . yaml-mode)
-           ("\\.yaml\\'" . yaml-mode))
+    :mode ((rx ".y" (optional "a") "ml" eos) . yaml-mode)
     :hook (yaml-mode . lsp))
 #+end_src
 **** Terraform
+[[https://www.terraform.io/][Terraform]] is the infrastructure-as-code tool of record at work, at the
+moment. There's an LSP implementation, but I haven't really gotten it
+working so for now I hobble along with the basics and my brain.
 #+begin_src emacs-lisp
   (use-package terraform-mode)
 #+end_src
 ** Org and Zettelkasten
 *** Neuron
+I learned about [[https://zettelkasten.de/introduction/][the Zettelkasten Method]] of knowledge management from
+the announcement of [[https://neuron.zettel.page/][Neuron]], and since then I've used it to /vastly/
+improve my understanding of Nix. I'm quite fond of the technique, and
+I'm working on expanding my workflow to include a proper reference
+manager and more effective literature review notes. ~neuron-mode~ is a
+rather nice frontend to the essentially plain Markdown of the
+Zettelkasten managed by Neuron.
 #+begin_src emacs-lisp
   (use-package neuron-mode
-    :init
-    (setq neuron-default-zettelkasten-directory "~/src/corpus"))
+    :commands neuron--get-cached-zettel-from-id
+    :custom
+    (neuron-default-zettelkasten-directory "~/src/corpus"))
+
+  (defun the--current-zettel ()
+    (when (derived-mode-p 'neuron-mode)
+      (f-base (buffer-file-name))))
 #+end_src
 *** Org
 #+begin_src emacs-lisp
@@ -505,97 +816,73 @@ Making LSP (and other tools) work sanely is much easier with
   (use-package org
     :ensure org-plus-contrib
     :hook (org-mode . org-indent-mode)
-    :init
-    (setq org-todo-keywords
-          '((sequence
-             "BACKLOG(b!)"
-             "TODO(t!)"
-             "NEXT(n)"
-             "IN-PROGRESS(i!)"
-             "|"
-             "DONE(d!)")
-            (sequence
-             "WAITING(w@/!)"
-             "HOLD(h@/!)"
-             "|"
-             "CANCELED(c@)")
-            (type
-             "PHONE(p!)"
-             "MEETING(m!)")))
-    (setq org-todo-keyword-faces
-          (quote (("TODO" :foreground "red" :weight bold)
-                  ("NEXT" :foreground "blue" :weight bold)
-                  ("IN-PROGRESS" :foreground "red" :weight bold)
-                  ("DONE" :foreground "forest green" :weight bold)
-                  ("WAITING" :foreground "orange" :weight bold)
-                  ("HOLD" :foreground "magenta" :weight bold)
-                  ("CANCELED" :foreground "forest green" :weight bold)
-                  ("MEETING" :foreground "forest green" :weight bold)
-                  ("PHONE" :foreground "forest green" :weight bold))))
+    :custom
+    (org-todo-keywords
+     '((sequence "BACKLOG(b!)" "TODO(t!)" "NEXT(n)" "IN-PROGRESS(i!)" "|" "DONE(d!)")
+       (sequence "WAITING(w@/!)" "HOLD(h@/!)" "|" "CANCELED(c@)")
+       (type "PHONE(p!)" "MEETING(m!)")))
 
-    (setq org-todo-state-tags-triggers
-          (quote (("CANCELED" ("CANCELED" . t))
-                  ("WAITING" ("WAITING" . t))
-                  ("HOLD" ("WAITING") ("HOLD" . t))
-                  (done ("WAITING") ("HOLD"))
-                  ("TODO" ("WAITING") ("CANCELLED") ("HOLD"))
-                  ("NEXT" ("WAITING") ("CANCELLED") ("HOLD"))
-                  ("DONE" ("WAITING") ("CANCELLED") ("HOLD")))))
+    (org-todo-keyword-faces
+     '(("TODO" :foreground "red" :weight bold)
+       ("NEXT" :foreground "blue" :weight bold)
+       ("IN-PROGRESS" :foreground "red" :weight bold)
+       ("DONE" :foreground "forest green" :weight bold)
+       ("WAITING" :foreground "orange" :weight bold)
+       ("HOLD" :foreground "magenta" :weight bold)
+       ("CANCELED" :foreground "forest green" :weight bold)
+       ("MEETING" :foreground "forest green" :weight bold)
+       ("PHONE" :foreground "forest green" :weight bold)))
 
-    (setq org-use-fast-todo-selection t)
-    (setq org-treat-S-cursor-todo-selection-as-state-change nil)
-    (setq org-archive-location (f-expand "archive/%s::* Archived Tasks" org-directory))
-    (setq org-insert-heading-respect-content t)
-    (setq org-refile-use-outline-path t
-          org-outline-path-complete-in-steps nil)
-    (setq org-log-into-drawer t)
-    (setq org-special-ctrl-a/e t
-          org-special-ctrl-k t)
-    (setq org-return-follows-link t)
-    (setq org-tag-persistent-alist
-          '((:startgroup . nil)
-            ("@work" . ?w)
-            ("@home" . ?h)
-            ("@phone" . ?p)
-            ("@mail" . ?m)
-            (:endgroup . nil)
-            ("ansible" . ?a)
-            ("epic" . ?e)
-            ("linux" . ?l)
-            ("noexport" . ?n)
-            ("crypt" . ?c)
-            ))
-    (setq org-directory "~/org")
-    (setq org-capture-templates
-          '(("t" "Todo" entry (file+headline "~/org/inbox.org" "Tasks")
-             "* BACKLOG %?\n %T\n  %i\n  %a")
-            ("m" "Meeting" entry (file+headline "~/org/work.org" "Meetings")
-             "* MEETING with %? :MEETING:\n%U" :clock-in t :clock-resume t)
-            ("p" "Phone call" entry (file+headline "~/org/work.org" "Phone Calls")
-             "* PHONE %? :PHONE:\n%U" :clock-in t :clock-resume t)
-            ("g" "Groceries" entry (file+headline "~/org/groceries.org" "Groceries")
-             "* %?\nEntered on %U\n  %i")
-            ("w" "Work" entry (file+headline "~/org/work.org" "Tasks")
-             "* TODO %?\n %T\n %i\n %a")
-            ("h" "Home" entry (file+headline "~/org/home.org" "Tasks")
-             "* TODO %?\n %i")))
+    (org-todo-state-tags-triggers
+     '(("CANCELED" ("CANCELED" . t))
+       ("WAITING" ("WAITING" . t))
+       ("HOLD" ("WAITING") ("HOLD" . t))
+       (done ("WAITING") ("HOLD"))
+       ("TODO" ("WAITING") ("CANCELLED") ("HOLD"))
+       ("NEXT" ("WAITING") ("CANCELLED") ("HOLD"))
+       ("DONE" ("WAITING") ("CANCELLED") ("HOLD"))))
 
-    (setq org-refile-targets
-          '((org-agenda-files :maxlevel . 3)))
+    (org-use-fast-todo-selection t)
+    (org-treat-S-cursor-todo-selection-as-state-change nil)
+    (org-archive-location (f-expand "archive/%s::* Archived Tasks" org-directory))
+    (org-insert-heading-respect-content t)
+    (org-refile-use-outline-path t)
+    (org-outline-path-complete-in-steps nil)
+    (org-log-into-drawer t)
+    (org-special-ctrl-a/e t)
+    (org-special-ctrl-k t)
+    (org-return-follows-link t)
+    (org-tag-persistent-alist
+     '((:startgroup . nil)
+       ("@work" . ?w)
+       ("@home" . ?h)
+       ("@phone" . ?p)
+       ("@mail" . ?m)
+       (:endgroup . nil)
+       ("noexport" . ?n)
+       ("crypt" . ?c)
+       ))
+    (org-directory "~/org")
+    (org-capture-templates
+     '(("t" "Todo" entry (file+headline "~/org/inbox.org" "Tasks")
+        "* BACKLOG %?\n %T\n  %i\n  %a")
+       ("m" "Meeting" entry (file+headline "~/org/work.org" "Meetings")
+        "* MEETING with %? :MEETING:\n%U" :clock-in t :clock-resume t)
+       ("p" "Phone call" entry (file+headline "~/org/work.org" "Phone Calls")
+        "* PHONE %? :PHONE:\n%U" :clock-in t :clock-resume t)
+       ("g" "Groceries" entry (file+headline "~/org/groceries.org" "Groceries")
+        "* %?\nEntered on %U\n  %i")
+       ("w" "Work" entry (file+headline "~/org/work.org" "Tasks")
+        "* TODO %?\n %T\n %i\n %a")
+       ("h" "Home" entry (file+headline "~/org/home.org" "Tasks")
+        "* TODO %?\n %i")))
 
-    (defun the-org-sort-ignore-errors ()
-      (condition-case x
-          (org-sort-entries nil ?a)
-        (user-error)))
+    (org-refile-targets
+     '((org-agenda-files :maxlevel . 3)))
 
-    (defun the-org-sort-buffer ()
-      "Sort all entries in the Org buffer recursively in alphabetical order."
-      (interactive)
-      (org-map-entries #'the-org-sort-ignore-errors))
-
-    (setq org-agenda-files '("~/org"))
-    (setq org-agenda-skip-scheduled-if-done t
-          org-agenda-skip-deadline-if-done t)
+    (org-agenda-files '("~/org"))
+    (org-agenda-skip-scheduled-if-done t)
+    (org-agenda-skip-deadline-if-done t)
     :config
     (require 'org-tempo))
 #+end_src
@@ -616,6 +903,88 @@ Making LSP (and other tools) work sanely is much easier with
       (make-local-variable 'gnutls-verify-error)
       (setq gnutls-verify-error nil))
     :hook (elpher-mode . the-elpher-hook))
+#+end_src
+** Custom Keybindings
+*** Mac Keys
+#+begin_src emacs-lisp
+  (the-with-operating-system macOS
+    (setq ns-right-command-modifier 'none
+          ns-right-option-modifier 'none
+          mac-right-command-modifier 'none
+          mac-right-option-modifier 'none)
+    (setq ns-right-control-modifier 'control
+          mac-right-control-modifier 'control)
+    (setq ns-control-modifier 'super
+          mac-control-modifier 'super)
+    (setq ns-command-modifier 'meta
+          mac-command-modifier 'meta)
+    (setq ns-option-modifier 'hyper
+          mac-option-modifier 'hyper)
+
+    (general-define-key
+     "s-s" 'save-buffer
+     "s-c" 'copy-region-as-kill
+     "s-v" 'yank))
+#+end_src
+*** Custom Keymap
+#+begin_src emacs-lisp
+  (defvar the-keymap (make-sparse-keymap)
+    "Keymap for THE commands that should be put under a prefix.
+    This keymap is bound under \\[the-keymap].")
+
+  ;;(general-define-key
+  ;; "H-T" '(:prefix-command the-keymap :wk "THE bindings"))
+
+  (general-create-definer the-leader :prefix "SPC" :global-prefix "H-T")
+
+  (the-leader
+   :states '(normal visual motion)
+   "" '(nil :wk "leader")
+   "SPC" '(execute-extended-command :wk "extended command")
+   "/" '(consult-ripgrep :wk "search directory"))
+
+  (eval-when-compile
+    (defun the--leader-form (name key)
+      `(general-create-definer ,(intern (concat "the-" name "-leader"))
+         :wrapping the-leader
+         :infix ,key)))
+
+  (defmacro the-make-leaders (leaders)
+    (dolist (leader leaders)
+      (eval (apply 'the--leader-form leader))))
+
+  (the-make-leaders
+   (
+    ("help" "h")
+    ("buffer" "b")
+    ("window" "w")
+    ("file" "f")
+    ("application" "a")
+    ("yank" "y")
+    ("mode" "m")
+    )
+   )
+
+  (the-help-leader
+    :states '(normal)
+    "" '(nil :wk "help")
+    "h" '(helpful-at-point :wk "at point")
+    "f" '(helpful-callable :wk "fn/macro")
+    "k" '(helpful-key :wk "key")
+    "v" '(helpful-variable :wk "variable"))
+
+  (the-file-leader
+   :states '(normal)
+   "" '(nil :wk "files")
+   "f" '(find-file :wk "find file"))
+
+  (the-buffer-leader
+    :states '(normal)
+    "" '(nil :wk "buffers")
+    "b" '(consult-buffer :wk "switch buffer")
+    "B" '(consult-buffer-other-window :wk "switch buffer (new window)")
+    "d" '(bury-buffer :wk "close buffer")
+    "D" '(kill-buffer :wk "kill buffer"))
 #+end_src
 
 ** Closing

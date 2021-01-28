@@ -16,6 +16,7 @@ let
       sd
       tokei
       xsv
+      tree-sitter
     ];
     dhall = [
       dhall
@@ -26,6 +27,7 @@ let
       dhall-yaml
     ];
     haskell = [ pandoc ];
+    node = with nodePackages; [ typescript-language-server typescript eslint npm yarn ];
     vc = with gitAndTools; [
       bfg-repo-cleaner
       diff-so-fancy
@@ -113,6 +115,7 @@ pkgs.lib.lists.flatten [
   tools.rust
   tools.dhall
   tools.haskell
+  tools.node
   tools.vc
   tools.nix
   tools.gnu

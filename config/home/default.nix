@@ -1,13 +1,15 @@
-{ pkgs, ... }:
+{ pkgs, config, ... }:
 rec {
   home.packages = import ../packages.nix { inherit pkgs; };
   home = {
     file = {
       ".emacs.d/early-init.el".source = ../emacs/early-init.el;
       ".emacs.d/init.el".source = ../emacs/init.el;
-      ".emacs.d/the.org".source = ../emacs/the.org;
       ".emacs.d/pragmata.el".source = ../emacs/pragmata.el;
     };
+    activation.linkEmacs = config.lib.dag.entryAfter [ "writeBoundary" ] ''
+      ln -sf $HOME/src/dots/config/emacs/the.org $HOME/.emacs.d/the.org
+    '';
   };
   programs = {
     man = {
