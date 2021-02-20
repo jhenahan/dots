@@ -63,6 +63,8 @@ let
       alks
       awscli
       maven
+      sbt
+      mill
     ];
     network = [
       httpie
@@ -91,11 +93,10 @@ let
     yaml-language-server
   ];
   other = [
-    mill
+    fortune
     bash
     emacs-all-the-icons-fonts
     texFull
-    neuron
     myEmacs
     gnupg
     gpgme
@@ -108,6 +109,7 @@ let
     terraform-docs
     bitwarden-cli
     html-tidy
+    graphviz
   ];
 in
 pkgs.lib.lists.flatten [

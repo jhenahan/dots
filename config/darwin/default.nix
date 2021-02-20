@@ -46,7 +46,7 @@ in
         power_icon_strip = "🔋 🔌";
         space_icon = "*";
         clock_icon = "⏰";
-        clock_format = "%F %R %z";
+        clock_format = "\"%F %R %z\"";
       };
     };
     yabai = {
@@ -56,7 +56,7 @@ in
         mouse_follows_focus = "on";
         focus_follows_mouse = "autoraise";
         window_placement = "second_child";
-        window_border = "on";
+        window_border = "off";
         window_border_width = 2;
         active_window_border_color = "0xffcc241d";
         normal_window_border_color = "0xff458588";
@@ -67,6 +67,70 @@ in
         right_padding = 0;
         window_gap = 5;
       };
+      extraConfig = ''
+        yabai -m rule --add app="^System Preferences$" manage=off
+        yabai -m rule --add app="^Microsoft Teams$" manage=off
+        yabai -m rule --add app="^Emacs$" manage=on
+      '';
+    };
+    skhd = {
+      enable = true;
+      package = pkgs.skhd;
+      skhdConfig = ''
+        # open a terminal
+
+        shift + cmd - a : open ~/Applications/Alacritty.app
+        
+        # restart yabai
+        
+        ctrl + alt + cmd - q : pkill yabai
+        
+        # toggle window split type
+        
+        ctrl + alt + cmd - s : yabai -m window --toggle split
+        
+        # float / unfloat window and center on screen
+        
+        ctrl + alt + cmd - w : yabai -m window --toggle float;\
+                               yabai -m window --grid 4:4:1:1:2:2
+        
+        # balance windows
+        ctrl + alt + cmd - b : yabai -m space --balance
+        
+        # rotate
+        
+        ctrl + alt + cmd - r : yabai -m space --rotate 90
+        
+        # monocle
+        ctrl + alt + cmd - m : yabai -m window --toggle zoom-fullscreen
+        
+        # focus windows
+        ctrl + alt + cmd - h : yabai -m window --focus west
+        ctrl + alt + cmd - j : yabai -m window --focus south
+        ctrl + alt + cmd - k : yabai -m window --focus north
+        ctrl + alt + cmd - l : yabai -m window --focus east
+        
+        # swap windows
+        shift + ctrl + alt + cmd - h : yabai -m window --swap west
+        shift + ctrl + alt + cmd - j : yabai -m window --swap south
+        shift + ctrl + alt + cmd - k : yabai -m window --swap north
+        shift + ctrl + alt + cmd - l : yabai -m window --swap east
+        
+        # move windows
+        shift + ctrl + alt - h : yabai -m window --warp west
+        shift + ctrl + alt - j : yabai -m window --warp south
+        shift + ctrl + alt - k : yabai -m window --warp north
+        shift + ctrl + alt - l : yabai -m window --warp east
+        
+        
+        # toggle window zoom
+        # alt - d : yabai -m window --toggle zoom-parent
+        # alt - f : yabai -m window --toggle zoom-fullscreen
+        
+        # toggle window split type
+        # alt - e : yabai -m window --toggle split
+
+      '';
     };
   };
   nix = {

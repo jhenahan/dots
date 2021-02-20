@@ -4,6 +4,7 @@ in
 { nixpkgs ? sources.nixpkgs
 , darwin ? sources.darwin
 , home-manager ? sources.home-manager
+, unstable ? sources.unstable
 }:
 let
   pkgs = import nixpkgs { };
@@ -19,6 +20,7 @@ let
     WORKDIR="$HOME/.dots"
     DOTFILES="$WORKDIR/dotfiles"
     NIXPKGS="$WORKDIR/nixpkgs"
+    UNSTABLE="$WORKDIR/unstable"
     DARWIN="$WORKDIR/darwin"
     HOME_MANAGER="$WORKDIR/home-manager"
     DARWIN_CONFIG="$DOTFILES/config/darwin"
@@ -26,6 +28,7 @@ let
     mkdir -p "$WORKDIR"
     ln -snfv ${buildDots} "$DOTFILES"
     ln -snfv ${nixpkgs} "$NIXPKGS"
+    ln -snfv ${unstable} "$UNSTABLE"
     ln -snfv ${darwin} "$DARWIN"
     ln -snfv ${home-manager} "$HOME_MANAGER"
     echo >&2 "Formatting..."

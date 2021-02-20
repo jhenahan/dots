@@ -138,7 +138,9 @@ happy.
   (if (fboundp 'menu-bar-mode)   (menu-bar-mode   -1))
   (if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
 
-  (setq default-frame-alist '((font . "PragmataPro Liga-14")
+  (set-face-font 'variable-pitch "DejaVu Serif-16")
+
+  (setq default-frame-alist '((font . "PragmataPro Liga-16")
                               (horizontal-scroll-bars)
                               (vertical-scroll-bars)))
 
@@ -293,6 +295,13 @@ The ~:config~ key to ~use-package~ indicates code which should be
 executed /after/ the package loads. Since we use ~:demand~, this is
 "right now".
 #+begin_src emacs-lisp
+  (use-package recentf
+    :ensure nil
+    :commands recentf-mode
+    :defines recentf-exclude
+    :custom (recentf-max-saved-items 25)
+    :init (recentf-mode))
+
   (use-package no-littering
     :demand t
     :custom
@@ -300,7 +309,6 @@ executed /after/ the package loads. Since we use ~:demand~, this is
           `((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))
     (custom-file (no-littering-expand-etc-file-name "custom.el"))
     :config
-    (use-package recentf :defines recentf-exclude)
     (add-to-list 'recentf-exclude no-littering-var-directory)
     (add-to-list 'recentf-exclude no-littering-etc-directory))
 
@@ -327,10 +335,11 @@ does some extra work to improve Org's use of the theme.
 #+begin_src emacs-lisp
   (use-package doom-themes
     :demand t
-    :commands doom-themes-org-config
     :config
     (load-theme 'doom-gruvbox t)
-    (require 'doom-themes-ext-org)
+    (use-package doom-themes-ext-org
+      :commands doom-themes-org-config
+      :ensure doom-themes)
     (doom-themes-org-config))
 #+end_src
 *** TLS
@@ -362,12 +371,12 @@ docstring.
 loaded.
 #+begin_src emacs-lisp
   (use-package which-key
-    :commands which-key-mode
+    :commands which-key-mode which-key--show-keymap which-key--hide-popup-ignore-command
     :init
     (which-key-mode 1))
 
   (use-package evil
-    :commands evil-mode
+    :commands evil-mode evil-set-initial-state evil-window-vsplit evil-window-split
     :custom
     (evil-want-integration t "Required for evil-collection")
     (evil-want-keybinding nil "Required for evil-collection")
@@ -378,11 +387,19 @@ loaded.
   (use-package evil-collection
     :after evil
     :commands evil-collection-init
-    :custom (evil-collection-setup-minibuffer t "Use Evil bindings in the minibuffer")
     :init (evil-collection-init))
 
   (use-package general
-    :commands general-define-key general-create-definer)
+    :commands general-define-key general-create-definer
+    :custom (general-override-states
+             '(insert
+               emacs
+               hybrid
+               normal
+               visual
+               motion
+               operator
+               replace)))
 #+end_src
 *** Fixing Emacs
 There are some weird defaults. We don't type on typewriters, anymore,
@@ -453,8 +470,10 @@ with it.
 
   (use-package consult
     :commands consult-buffer consult-buffer-other-window consult-ripgrep
+    :custom
+    (consult-project-root-function #'projectile-project-root)
     :config
-    (require 'consult-selectrum))
+    (use-package consult-selectrum :ensure consult))
 
   (use-package marginalia
     :commands marginalia-mode
@@ -464,12 +483,24 @@ with it.
     (marginalia-mode))
 
   (use-package embark
-    :bind ("C-S-a" . embark-act))
+    :bind ("C-S-a" . embark-act)
+    :config
+    (evil-set-initial-state 'embark-collect-mode 'emacs))
 
   (use-package embark-consult
     :after (embark consult)
     :hook
     (embark-collect-mode . embark-consult-preview-minor-mode))
+
+  (use-package mini-frame
+    :commands mini-frame-mode
+    :custom
+    (mini-frame-show-parameters
+     '((top . 0.5)
+       (width . 0.7)
+       (left . 0.5)))
+    :init
+    (mini-frame-mode +1))
 #+end_src
 *** Help
 Emacs has rich built-in help and Info docs, but [[https://github.com/Wilfred/helpful][helpful]] provides some
@@ -517,17 +548,20 @@ I still don't really grok standard Emacs undo, so I use [[http://www.dr-qubit.or
 **** Epithet
 #+begin_src emacs-lisp
   (use-package epithet
-    :init
-    (defun the-epithet-for-neuron ()
-      "Suggest a name for a `neuron-mode' buffer."
-      (when (derived-mode-p 'neuron-mode)
-        (let* ((zettel-id (f-base (buffer-file-name)))
-               (zettel (neuron--get-cached-zettel-from-id zettel-id))
-               (title (alist-get 'zettelTitle zettel)))
-          title)))
-    :config
-    (add-to-list 'epithet-suggesters 'the-epithet-for-neuron)
-    :hook (neuron-mode . epithet-rename-buffer))
+    :hook ((Info-selection eww-after-render help-mode occur-mode) . epithet-rename-buffer))
+#+end_src
+*** Windows
+**** ace-window
+#+begin_src emacs-lisp
+  (use-package ace-window
+    :commands ace-window)
+#+end_src
+*** Recent Files
+#+begin_src emacs-lisp
+  (use-package recentf
+    :ensure nil
+    :defines recentf-exclude
+    :custom (recentf-max-saved-items 25))
 #+end_src
 *** Completion
 I've used [[https://company-mode.github.io/][Company]] for several years (after it more or less ate
@@ -538,6 +572,11 @@ tab completion common in other editors.
 provides the same frecency sorting for completion candidates as for
 other candidate selections.
 #+begin_src emacs-lisp
+  (defun the-yas-expand-or-company-complete ()
+    (interactive)
+    (or (yas/expand)
+        (call-interactively #'company-indent-or-complete-common)))
+
   (use-package company
     :commands global-company-mode
     :custom
@@ -552,9 +591,7 @@ other candidate selections.
     :init
     (use-package company-tng
       :ensure company
-      :commands company-tng-mode
-      :init
-      (company-tng-mode +1))
+      :hook (after-init . company-tng-mode))
     (global-company-mode +1))
 
   (use-package company-box
@@ -584,6 +621,17 @@ Making LSP (and other tools) work sanely is much easier with [[https://direnv.ne
     :commands direnv-mode
     :init
     (direnv-mode))
+#+end_src
+*** Verb
+HTTP client in Org. What more could you ask for?
+#+begin_src emacs-lisp
+  (use-package verb
+    :mode (((rx ".http" eos) . verb-mode)))
+#+end_src
+*** Terminal
+#+begin_src emacs-lisp
+  (use-package vterm
+    :ensure t)
 #+end_src
 ** Writing
 *** Autofill
@@ -629,6 +677,16 @@ fact. Will need to revisit.
     (global-flycheck-mode +1))
 #+end_src
 ** Programming
+*** Projects
+#+begin_src emacs-lisp
+  (use-package projectile
+    :commands projectile-command-map projectile-project-root projectile-mode
+    :custom
+    (projectile-project-search-path '("~/src/"))
+    (projectile-sort-order 'recently-active)
+    :init
+    (projectile-mode +1))
+#+end_src
 *** Language Server Protocol
 [[https://microsoft.github.io/language-server-protocol/][The Language Server Protocol]] is an inter-process communication
 protocol to expose IDE features in a uniform fashion to any editor
@@ -649,6 +707,8 @@ that provide snippets will work correctly.
     (lsp-enable-indentation t)
     (lsp-semantic-highlighting t)
     (lsp-auto-configure t)
+    (lsp-prefer-flymake nil)
+    (lsp-enable-dap-auto-configure nil)
     :config
     (use-package lsp-modeline :ensure lsp-mode)
     (use-package lsp-headerline :ensure lsp-mode))
@@ -656,18 +716,25 @@ that provide snippets will work correctly.
   (use-package lsp-ui
     :hook (lsp-mode . lsp-ui-mode))
 
-  (use-package yasnippet)
+  (use-package yasnippet
+    :commands yas-global-mode
+    :init
+    (yas-global-mode +1))
+
+  (use-package posframe)
 #+end_src
-*** Debug Adapter Protocol
+*** COMMENT Debug Adapter Protocol
 What LSP is to Intellisense and linting, [[https://microsoft.github.io/debug-adapter-protocol/][the Debug Adapter Protocol]] is to
 debuggers. I haven't actually used this much, but maybe someday.
 #+begin_src emacs-lisp
-  (use-package posframe)
-
   (use-package dap-mode
-    :demand t
     :hook
-    (lsp-mode . dap-mode))
+    (lsp-mode . dap-auto-configure-mode))
+
+  (use-package dap-ui
+    :ensure dap-mode
+    :hook
+    (dap-mode . dap-ui-mode))
 #+end_src
 *** Highlighting
 #+begin_src emacs-lisp
@@ -714,8 +781,7 @@ lean much more heavily on the FP features, but it's also what I write
 at work so needs must, etc.
 #+begin_src emacs-lisp
   (use-package scala-mode
-    :interpreter
-    ("scala" . scala-mode)
+    :mode ((rx ".s" (or "cala" "bt") eos) . scala-mode)
     :hook (scala-mode . lsp))
 
   (use-package sbt-mode
@@ -732,7 +798,8 @@ at work so needs must, etc.
 
   (use-package lsp-metals
     :custom
-    (lsp-metals-treeview-show-when-views-received t))
+    (lsp-metals-show-inferred-type t)
+    (lsp-metals-show-implicit-arguments t))
 #+end_src
 **** JavaScript/TypeScript/React/etc.
 Well, I guess I have to touch UI code here and there, now.
@@ -781,6 +848,9 @@ helpful to keep the mode around.
   (use-package yaml-mode
     :mode ((rx ".y" (optional "a") "ml" eos) . yaml-mode)
     :hook (yaml-mode . lsp))
+
+  (use-package jinja2-mode
+    :mode ((rx ".j2" eos) . jinja2-mode))
 #+end_src
 **** Terraform
 [[https://www.terraform.io/][Terraform]] is the infrastructure-as-code tool of record at work, at the
@@ -790,7 +860,7 @@ working so for now I hobble along with the basics and my brain.
   (use-package terraform-mode)
 #+end_src
 ** Org and Zettelkasten
-*** Neuron
+*** COMMENT Neuron
 I learned about [[https://zettelkasten.de/introduction/][the Zettelkasten Method]] of knowledge management from
 the announcement of [[https://neuron.zettel.page/][Neuron]], and since then I've used it to /vastly/
 improve my understanding of Nix. I'm quite fond of the technique, and
@@ -808,7 +878,325 @@ Zettelkasten managed by Neuron.
     (when (derived-mode-p 'neuron-mode)
       (f-base (buffer-file-name))))
 #+end_src
-*** Org
+*** Org Bankruptcy
+#+begin_src emacs-lisp
+  (use-package doct
+    :ensure t
+    :commands doct)
+
+  (use-package org
+    :ensure org-plus-contrib
+    :mode (((rx ".org" eos) . org-mode)
+           ((rx ".http" eos) . org-mode))
+    :hook (org-mode . org-indent-mode)
+    :custom
+    (org-directory "~/org")
+    (org-agenda-files (--map (f-expand it org-directory) '("inbox.org" "work.org" "personal.org")))
+    (org-catch-invisible-edits 'smart)
+    (org-log-done 'time)
+    (org-log-into-drawer t)
+    (org-log-state-notes-insert-after-drawers nil)
+    (org-pretty-entities t)
+    (org-todo-keywords
+     '((sequence "BACKLOG(b!)" "TODO(t!)" "NEXT(n)" "IN-PROGRESS(i!)" "|" "DONE(d!)")
+       (sequence "REPORT(r@)" "BUG(g@)" "KNOWNCAUSE(k@)" "|" "FIXED(f@)" "WONTFIX(x@)")
+       (sequence "WAITING(w@/!)" "HOLD(h@/!)" "|" "CANCELED(c@)")))
+    (org-todo-keyword-faces
+     '(("TODO" :foreground "red" :weight bold)
+       ("NEXT" :foreground "blue" :weight bold)
+       ("IN-PROGRESS" :foreground "red" :weight bold)
+       ("DONE" :foreground "forest green" :weight bold)
+       ("REPORT" :foreground "orange" :weight bold)
+       ("BUG" :foreground "red" :weight bold)
+       ("KNOWNCAUSE" :foreground "blue" :weight bold)
+       ("FIXED" :foreground "forest green" :weight bold)
+       ("WONTFIX" :foreground "forest green" :weight bold)
+       ("WAITING" :foreground "orange" :weight bold)
+       ("HOLD" :foreground "magenta" :weight bold)
+       ("CANCELED" :foreground "forest green" :weight bold)
+       ))
+    (org-todo-state-tags-triggers
+     '(("CANCELED" ("CANCELED" . t))
+       ("WAITING" ("WAITING" . t))
+       ("HOLD" ("WAITING") ("HOLD" . t))
+       (done ("WAITING") ("HOLD"))
+       ("BACKLOG" ("WAITING") ("CANCELED") ("HOLD"))
+       ("TODO" ("WAITING") ("CANCELED") ("HOLD"))
+       ("IN-PROGRESS" ("WAITING") ("CANCELED") ("HOLD"))
+       ("NEXT" ("WAITING") ("CANCELED") ("HOLD"))
+       ("DONE" ("WAITING") ("CANCELED") ("HOLD"))))
+    (org-refile-use-outline-path t)
+    (org-outline-path-complete-in-steps nil)
+    (org-refile-allow-creating-parent-nodes 'confirm)
+    (org-refile-targets '((nil :maxlevel . 9)
+                          (org-agenda-files :maxlevel . 9)))
+    (org-tag-persistent-alist
+     '((:startgroup . nil)
+       ("@work" . ?w)
+       ("@home" . ?h)
+       ("@out" . ?o)
+       (:endgroup . nil)
+       ("noexport" . ?n)
+       ))
+    (org-capture-templates
+     (doct `(("inbox"
+              :keys "o"
+              :file ,(f-expand "inbox.org" org-directory)
+              :headline "Todos"
+              :todo-state "BACKLOG"
+              :template
+              ("* %{todo-state} %^{Description}"
+               ":PROPERTIES:"
+               ":Created: %U"
+               ":END:"
+               "%i"
+               "%?"))
+             ("org-protocol"
+              :keys "c"
+              :file ,(f-expand "inbox.org" org-directory)
+              :headline "Links"
+              :todo-state "BACKLOG"
+              :immediate-finish t
+              :template
+              ("* %{todo-state} [[%:link][%:description]]"
+               ":PROPERTIES:"
+               ":Created: %U"
+               ":END:"
+               "%:initial"))
+             ("work"
+              :keys "w"
+              :file ,(f-expand "work.org" org-directory)
+              :tags ":@work:"
+              :clock-in t
+              :clock-resume t
+              :template
+              ("* %{todo-state} %^{Description} %{tags}"
+               "SCHEDULED: %^t"
+               ":PROPERTIES:"
+               ":Created: %U"
+               ":END:"
+               "%i"
+               "%?")
+              :children
+              (("Task"
+                :keys "t"
+                :headline "Tasks"
+                :todo-state "BACKLOG")
+               ("Meeting"
+                :keys "m"
+                :headline "Meetings"
+                :todo-state "NEXT"
+                :tags ":@work:Meeting:")
+               ("Phone call"
+                :keys "p"
+                :headline "Phone Calls"
+                :todo-state "NEXT"
+                :tags ":@work:Phone:")
+               ("Email"
+                :keys "e"
+                :headline "Emails"
+                :todo-state "NEXT"
+                :tags ":@work:Email:")))
+             ("personal"
+              :keys "p"
+              :file ,(f-expand "personal.org" org-directory)
+              :tags ":@home:"
+              :template
+              ("* %{todo-state} %^{Description} %{tags}"
+               ":PROPERTIES:"
+               ":Created: %U"
+               ":END:"
+               "%i"
+               "%?")
+              :children
+              (("Task"
+                :keys "t"
+                :headline "Tasks"
+                :todo-state "BACKLOG"
+                :tags "%^g")
+               ("Errand"
+                  :keys "e"
+                  :headline "Errands"
+                  :todo-state "BACKLOG"
+                  :tags "%^g:@out:")
+               ("Habit"
+                :keys "h"
+                :headline "Habits"
+                :todo-state "TODO"
+                :template
+                ("* %{todo-state} %^{Description} %{tags}"
+                 "SCHEDULED: <%<%Y-%m-%d %a .+1d>>"
+                 ":PROPERTIES:"
+                 ":CREATED: %U"
+                 ":STYLE: habit"
+                 ":REPEAT_TO_STATE: TODO"
+                 ":END:"))
+               ("Appointment"
+                :keys "a"
+                :headline "Appointments"
+                :todo-state "BACKLOG"
+                :tags "%^g:Appointment:")
+               ("Phone call"
+                :keys "p"
+                :headline "Phone calls"
+                :todo-state "BACKLOG"
+                :tags ":@home:Phone:")
+               ("Email"
+                :keys "e"
+                :headline "Emails"
+                :todo-state "BACKLOG"
+                :tags ":@home:Email:"))))))
+    (org-treat-S-cursor-todo-selection-as-state-change nil "Don't clutter the log when I'm just mucking with TODO state")
+    (org-clock-persist t)
+    (org-clock-idle-time 10)
+    (org-clock-history-length 23)
+    (org-clock-in-resume t)
+    (org-clock-out-remove-zero-time-clocks t)
+    (org-clock-out-when-done t)
+    (org-clock-persist-query-resume nil)
+    (org-clock-auto-clock-resolution 'when-no-clock-is-running)
+    (org-clock-report-include-clocking-task t)
+    (org-clock-in-switch-to-state "IN-PROGRESS")
+    (org-clock-out-switch-to-state 'the-clockout-state)
+    :init
+    (use-package org-tempo
+      :ensure org-plus-contrib
+      :init
+      (add-to-list 'org-modules 'org-tempo))
+    (use-package org-habit
+      :ensure org-plus-contrib
+      :init
+      (add-to-list 'org-modules 'org-habit))
+    (use-package org-id
+      :ensure org-plus-contrib
+      :init
+      (add-to-list 'org-modules 'org-id))
+    (use-package org-protocol
+      :ensure org-plus-contrib
+      :init
+      (add-to-list 'org-modules 'org-protocol))
+    (eval-when-compile
+      (defun the-clockout-state (oldstate)
+          (let ((state (completing-read "State: " org-todo-keywords-1)))
+            state))
+      (defun the-delete-frame-after-capture ()
+        (-when-let ((&alist 'name name) (frame-parameters))
+          (when (equal name "org-protocol-capture")
+            (delete-frame)))))
+    (add-hook 'org-capture-after-finalize-hook 'the-delete-frame-after-capture)
+    :config
+    (org-clock-persistence-insinuate))
+
+  (use-package org-mru-clock
+    :ensure t
+    :commands org-mru-clock-in org-mru-clock-select-recent-task
+    :custom
+    (org-mru-clock-files #'org-agenda-files)
+    (org-mru-clock-predicate #'org-mru-clock-exclude-done-and-archived)
+    (org-mru-clock-completing-read #'selectrum-completing-read)
+    (org-mru-clock-how-many 100))
+
+  (use-package org-super-agenda
+    :commands org-super-agenda-mode
+    :init (org-super-agenda-mode)
+    :custom
+    (org-super-agenda-groups
+     '(
+       (:name "Work"
+              :and
+              (:todo
+               ("NEXT" "TODO" "IN-PROGRESS")
+               :tag "@work"))
+       (:name "Bugs"
+              :and
+              (:todo
+               ("REPORT" "BUG" "KNOWNCAUSE")
+               :tag "@work"))
+       (:name "Blocked"
+              :and
+              (:todo
+               ("WAITING" "HOLD")
+               :tag "@work"))
+       (:name "Today"
+              :and
+              (:time-grid t
+               :habit nil
+               :todo ("NEXT" "TODO" "IN-PROGRESS")))
+       (:name "Important"
+              :priority "A")
+       (:name "Horizon"
+              :priority<= "B")
+       (:name "Errands"
+              :tag "@out")
+       (:name "Habits"
+              :habit t))))
+
+  (use-package evil-org
+    :hook (org-mode . evil-org-mode)
+    :commands evil-org-set-key-theme
+    :config
+    (evil-org-set-key-theme '(textobjects insert navigation additional shift todo heading))
+    (use-package evil-org-agenda
+      :commands evil-org-agenda-set-keys
+      :ensure evil-org)
+    (evil-org-agenda-set-keys))
+
+  (use-package org-superstar
+    :hook (org-mode . org-superstar-mode))
+
+  (use-package org-roam
+    :hook (after-init . org-roam-mode)
+    :custom
+    (epa-file-encrypt-to '("speaker@deadbriga.de"))
+    (epa-file-select-keys 1 "A terrible hack!")
+    (org-roam-directory (f-expand "corpus" org-directory))
+    (org-roam-title-sources '((title headline) alias))
+    (org-roam-tag-sources '(prop))
+    (org-roam-buffer-position 'right)
+    (org-roam-buffer-window-parameters '((no-delete-other-windows . t)))
+    (org-roam-link-use-custom-faces 'everywhere)
+    (org-roam-completion-system 'default)
+    (org-roam-dailies-directory "daily/")
+    (org-roam-db-gc-threshold most-positive-fixnum)
+    (org-roam-dailies-capture-templates
+     '(
+       ("j" "journal" entry
+        #'org-roam-capture--get-point
+        "* %?"
+        :file-name "daily/%<%Y-%m-%d>"
+        :head "#+title: %<%Y-%m-%d>\n"
+        :olp ("Journal"))
+
+       ("w" "work" entry
+        #'org-roam-capture--get-point
+        "* %?"
+        :file-name "daily/%<%Y-%m-%d>"
+        :head "#+title: %<%Y-%m-%d>\n"
+        :olp ("Work"))
+       ))
+    :init
+    (eval-when-compile
+      (defmacro the-roam-encrypted-dailies-macro (func)
+        "Wrap org-roam FUNC with `org-roam-encrypt-files' set `t'"
+        (let ((func-name (symbol-name func)))
+          `(defun ,(intern (s-concat "the-encrypted-" func-name)) ()
+             ,(format "`%s' wrapped with `org-roam-encrypt-files'" func-name)
+             (interactive)
+             (let ((org-roam-encrypt-files t))
+               (call-interactively ',func))))))
+
+    :config
+    (the-roam-encrypted-dailies-macro org-roam-dailies-capture-today))
+
+  ;;; Waiting on https://github.com/tmalsburg/helm-bibtex/pull/355 to resolve
+  (use-package org-ref
+    :custom
+    (reftex-default-bibliography '("~/org/bibliography/index.bib"))
+    (org-ref-bibliography-notes "~/org/bibliography/notes.org")
+    (org-ref-default-bibliography reftex-default-bibliography)
+    (org-ref-pdf-directory "~/org/bibliography/pdfs"))
+#+end_src
+*** COMMENT Org
 #+begin_src emacs-lisp
   (use-package org-bullets
     :hook (org-mode . org-bullets-mode))
@@ -856,6 +1244,7 @@ Zettelkasten managed by Neuron.
      '((:startgroup . nil)
        ("@work" . ?w)
        ("@home" . ?h)
+       ("@out" . ?o)
        ("@phone" . ?p)
        ("@mail" . ?m)
        (:endgroup . nil)
@@ -878,13 +1267,14 @@ Zettelkasten managed by Neuron.
         "* TODO %?\n %i")))
 
     (org-refile-targets
-     '((org-agenda-files :maxlevel . 3)))
+     '((nil :maxlevel . 9)
+       (org-agenda-files :maxlevel . 9)))
 
     (org-agenda-files '("~/org"))
     (org-agenda-skip-scheduled-if-done t)
     (org-agenda-skip-deadline-if-done t)
     :config
-    (require 'org-tempo))
+    (use-package org-tempo :ensure org-plus-contrib))
 #+end_src
 ** Modeline
 #+begin_src emacs-lisp
@@ -892,8 +1282,8 @@ Zettelkasten managed by Neuron.
     :hook (window-setup . doom-modeline-mode)
     :init
     (setq doom-modeline-height 1)
-    (set-face-attribute 'mode-line nil :family "PragmataPro Liga" :height 140)
-    (set-face-attribute 'mode-line-inactive nil :family "PragmataPro Liga" :height 140))
+    (set-face-attribute 'mode-line nil :family "PragmataPro Liga" :height 160)
+    (set-face-attribute 'mode-line-inactive nil :family "PragmataPro Liga" :height 160))
 #+end_src
 ** Clients
 #+begin_src emacs-lisp
@@ -932,24 +1322,30 @@ Zettelkasten managed by Neuron.
     "Keymap for THE commands that should be put under a prefix.
     This keymap is bound under \\[the-keymap].")
 
-  ;;(general-define-key
-  ;; "H-T" '(:prefix-command the-keymap :wk "THE bindings"))
-
-  (general-create-definer the-leader :prefix "SPC" :global-prefix "H-T")
+  (general-create-definer the-leader
+    :keymap the-keymap
+    :prefix "SPC"
+    :global-prefix "H-T")
 
   (the-leader
    :states '(normal visual motion)
    "" '(nil :wk "leader")
    "SPC" '(execute-extended-command :wk "extended command")
-   "/" '(consult-ripgrep :wk "search directory"))
+   "/" '(consult-ripgrep :wk "search directory")
+   "u" '(undo-tree-visualize :wk "undo tree")
+   "p" '(:keymap projectile-command-map :wk "project"))
 
   (eval-when-compile
     (defun the--leader-form (name key)
-      `(general-create-definer ,(intern (concat "the-" name "-leader"))
+      `(general-create-definer
+         ,(intern (concat "the-"
+                          (replace-regexp-in-string " " "-" name)
+                          "-leader"))
          :wrapping the-leader
          :infix ,key)))
 
   (defmacro the-make-leaders (leaders)
+    "Generate leader key helpers for a list of LEADERS."
     (dolist (leader leaders)
       (eval (apply 'the--leader-form leader))))
 
@@ -958,12 +1354,42 @@ Zettelkasten managed by Neuron.
     ("help" "h")
     ("buffer" "b")
     ("window" "w")
+    ("go to" "g")
     ("file" "f")
     ("application" "a")
     ("yank" "y")
     ("mode" "m")
+    ("zettel" "z")
+    ("org" "o")
     )
    )
+
+  (the-mode-leader
+    :states '(normal)
+    "" '(nil :wk "mode-specific"))
+
+  (the-org-leader
+    :states '(normal)
+    "" '(nil :wk "org")
+    "SPC" '(org-todo :wk "todo state")
+    "o" '(org-capture :wk "capture")
+    "a" '(org-agenda :wk "agenda")
+    "b" '(org-switchb :wk "buffers")
+    "t" '(org-set-tags-command :wk "tags")
+    "T" '(org-show-todo-tree :wk "todos")
+    "r" '(org-refile :wk "refile")
+    "s" '(org-schedule :wk "schedule")
+    "d" '(org-deadline :wk "deadline")
+    "!" '(org-priority :wk "priority")
+    "p" '(org-set-property :wk "properties")
+    "c" '(nil :wk "clock")
+    "c c" '(org-mru-clock-goto :wk "go to current clock")
+    "c i" '(org-mru-clock-in :wk "clock in")
+    "c l" '(org-mru-clock-select-recent-task :wk "clock recent task")
+    "c o" '(org-clock-out :wk "clock out")
+    "l" '(nil :wk "link")
+    "l s" '(org-store-link :wk "store")
+    "l i" '(org-insert-link :wk "insert"))
 
   (the-help-leader
     :states '(normal)
@@ -973,10 +1399,28 @@ Zettelkasten managed by Neuron.
     "k" '(helpful-key :wk "key")
     "v" '(helpful-variable :wk "variable"))
 
+  (the-go-to-leader
+    :states '(normal)
+    "" '(nil :wk "go to")
+    "l" '(consult-line :wk "line")
+    "L" '(consult-goto-line :wk "line number")
+    "h" '(consult-outline :wk "heading")
+    "i" '(consult-imenu :wk "index"))
+
+  (the-yank-leader
+    :states '(normal)
+    "" '(nil :wk "yank")
+    "y" '(consult-yank :wk "yank"))
+
   (the-file-leader
-   :states '(normal)
-   "" '(nil :wk "files")
-   "f" '(find-file :wk "find file"))
+    :states '(normal)
+    "" '(nil :wk "files")
+    "f" '(find-file :wk "find file"))
+
+  (general-create-definer the-dotfile-leader
+    :states '(normal)
+    :wrapping the-file-leader
+    :infix "e")
 
   (the-buffer-leader
     :states '(normal)
@@ -985,8 +1429,51 @@ Zettelkasten managed by Neuron.
     "B" '(consult-buffer-other-window :wk "switch buffer (new window)")
     "d" '(bury-buffer :wk "close buffer")
     "D" '(kill-buffer :wk "kill buffer"))
-#+end_src
 
+
+  (defun the-vsplit-with-file (file)
+    "As `evil-window-vsplit', but prompt for FILE."
+    (interactive "FFile: ")
+    (evil-window-vsplit nil file))
+
+  (defun the-split-with-file (file)
+    "As `evil-window-split', but prompt for FILE."
+    (interactive "FFile: ")
+    (evil-window-split nil file))
+
+  (defun the-swap-window ()
+    "Swap windows using `ace-window'."
+    (interactive)
+    (let ((current-prefix-arg '(4)))
+      (call-interactively 'ace-window)))
+
+  (defun the-delete-window ()
+    "Delete window using `ace-window'."
+    (interactive)
+    (let ((current-prefix-arg '(16)))
+      (call-interactively 'ace-window)))
+
+  (the-window-leader
+    :states '(normal)
+    "" '(nil :wk "windows")
+    "/" '(the-vsplit-with-file :wk "split right (prompt for file)")
+    "-" '(the-split-with-file :wk "split down (prompt for file)")
+    "?" '(evil-window-vsplit :wk "split right")
+    "_" '(evil-window-split :wk "split down")
+    "w" '(ace-window :wk "switch window")
+    "s" '(the-swap-window :wk "swap windows")
+    "d" '(delete-window :wk "delete window")
+    "D" '(the-delete-window :wk "delete window selectively"))
+
+  (the-zettel-leader
+    :states '(normal)
+    "" '(nil :wk "zettelkasten")
+    "z" '(org-roam-find-file :wk "find zettel")
+    "c" '(org-roam-capture :wk "background zettel")
+    "i" '(org-roam-insert :wk "insert")
+    "j j" '(the-encrypted-org-roam-dailies-capture-today :wk "journal dispatch")
+    )
+#+end_src
 ** Closing
 #+begin_src emacs-lisp
   (server-start)
