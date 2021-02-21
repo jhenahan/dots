@@ -44,7 +44,7 @@ let
           -I "home-manager=$HOME_MANAGER"
     fi
     echo >&2 "Switching to new configuration..."
-    darwin-rebuild switch --keep-going --show-trace \
+    darwin-rebuild switch -j8 --keep-going --show-trace \
           -I "darwin=$DARWIN" \
           -I "darwin-config=$DARWIN_CONFIG" \
           -I "nixpkgs=$NIXPKGS" \
