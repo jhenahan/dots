@@ -1069,6 +1069,8 @@ Zettelkasten managed by Neuron.
       (add-to-list 'org-modules 'org-habit))
     (use-package org-id
       :ensure org-plus-contrib
+      :custom
+      (org-id-link-to-org-use-id t)
       :init
       (add-to-list 'org-modules 'org-id))
     (use-package org-protocol

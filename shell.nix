@@ -4,15 +4,14 @@ in
 { nixpkgs ? sources.nixpkgs
 , darwin ? sources.darwin
 , home-manager ? sources.home-manager
-, unstable ? sources.unstable
 }:
 let
   pkgs = import nixpkgs { };
   buildDots = "$(nix-build --no-out-link)";
   files = "$(find . -path ./nix -prune -false -o -name '*.nix')";
-  lint = pkgs.writeShellScriptBin "lint" ''
-    ${pkgs.nix-linter}/bin/nix-linter ${files} "$@"
-  '';
+  #lint = pkgs.writeShellScriptBin "lint" ''
+  #  ${pkgs.nix-linter}/bin/nix-linter ${files} "$@"
+  #'';
   format = pkgs.writeShellScriptBin "format" ''
     ${pkgs.nixpkgs-fmt}/bin/nixpkgs-fmt ${files} "$@"
   '';
@@ -20,7 +19,6 @@ let
     WORKDIR="$HOME/.dots"
     DOTFILES="$WORKDIR/dotfiles"
     NIXPKGS="$WORKDIR/nixpkgs"
-    UNSTABLE="$WORKDIR/unstable"
     DARWIN="$WORKDIR/darwin"
     HOME_MANAGER="$WORKDIR/home-manager"
     DARWIN_CONFIG="$DOTFILES/config/darwin"
@@ -28,18 +26,17 @@ let
     mkdir -p "$WORKDIR"
     ln -snfv ${buildDots} "$DOTFILES"
     ln -snfv ${nixpkgs} "$NIXPKGS"
-    ln -snfv ${unstable} "$UNSTABLE"
     ln -snfv ${darwin} "$DARWIN"
     ln -snfv ${home-manager} "$HOME_MANAGER"
     echo >&2 "Formatting..."
     format
     echo >&2 "Linting..."
-    lint
+    #lint
     >&2 echo "Setting up nix-darwin..."
     if (! command -v darwin-rebuild); then
         echo >&2 "Installing nix-darwin..."
         export NIX_PATH=darwin=$DARWIN:nixpkgs=$NIXPKGS:darwin-config=$DARWIN_CONFIG:nixpkgs-overlays=$OVERLAYS:home-manager=$HOME_MANAGER:$NIX_PATH
-        $(nix-build '<darwin>' -A system --no-out-link)/sw/bin/darwin-rebuild switch --keep-going \
+        $(nix-build '<darwin>' -A system --no-out-link)/sw/bin/darwin-rebuild switch -j8 --keep-going \
           -I "darwin=$DARWIN" \
           -I "darwin-config=$DARWIN_CONFIG" \
           -I "nixpkgs=$NIXPKGS" \
@@ -55,4 +52,4 @@ let
           -I "home-manager=$HOME_MANAGER"
   '';
 in
-pkgs.mkShell { buildInputs = [ switch format lint ]; }
+pkgs.mkShell { buildInputs = [ switch format ]; }

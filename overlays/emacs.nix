@@ -31,7 +31,17 @@ self: super:
     '';
   });
   myEmacs = super.emacsWithPackagesFromUsePackage {
-    package = self.emacsGcc;
+    package = super.emacsGcc.override {
+      libgccjit = super.gcc9.cc.override {
+        name = "libgccjit";
+        langFortran = false;
+        langCC = false;
+        langC = false;
+        profiledCompiler = false;
+        langJit = true;
+        enableLTO = false;
+      };
+    };
     config = ../config/emacs/the.org;
     alwaysEnsure = true;
     alwaysTangle = true;

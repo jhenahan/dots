@@ -2,6 +2,7 @@
 let
   current_user = builtins.getEnv "USER";
   home = builtins.getEnv "HOME";
+  sources = import ../../nix/sources.nix;
 in
 {
   imports = [ <home-manager/nix-darwin> ];
@@ -9,7 +10,6 @@ in
   nix.nixPath = [
     "darwin=$HOME/.dots/darwin"
     "home-manager=$HOME/.dots/home-manager"
-    "darwin-config=$HOME/.dots/dotfiles/config/darwin"
     "nixpkgs=$HOME/.dots/nixpkgs"
   ];
   system.build.applications = pkgs.lib.mkForce (pkgs.buildEnv {
@@ -29,7 +29,8 @@ in
   home-manager.useGlobalPkgs = true;
   home-manager.backupFileExtension = "backup";
   home-manager.users.${current_user} = import ../home;
-  programs.fish.enable = true;
+  programs.fish = import ./fish.nix { inherit pkgs; };
+  environment.darwinConfig = "$HOME/.dots/dotfiles/config/darwin";
   environment.shells = [ pkgs.fish ];
   services = {
     nix-daemon.enable = true;
@@ -134,7 +135,8 @@ in
     };
   };
   nix = {
-    package = pkgs.nixStable;
+    package = pkgs.nixFlakes;
+    extraOptions = "experimental-features = nix-command flakes";
     trustedUsers = [
       "root"
       current_user
